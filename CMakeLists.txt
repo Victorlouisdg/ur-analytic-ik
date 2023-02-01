@@ -86,5 +86,12 @@ nanobind_add_module(
   ur_analytic_ik/ur_analytic_ik_ext.cpp
 )
 
+list(PREPEND CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/cmake)
+include(eigen)
+
+target_link_libraries(ur_analytic_ik_ext PUBLIC
+    Eigen3::Eigen
+)
+
 # Install directive for scikit-build
 install(TARGETS ur_analytic_ik_ext LIBRARY DESTINATION .)
