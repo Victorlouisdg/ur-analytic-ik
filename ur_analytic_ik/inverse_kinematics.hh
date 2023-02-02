@@ -77,14 +77,8 @@ double calculate_theta2(double KS, double KC, double c3, double s3, double a2, d
   return theta2;
 }
 
-Matrix8x6 ur5e_inverse_kinematics(Matrix4x4 desired_EEF_pose) {
-  // UR5e DH parameters
-  const double d1 = 0.1625;
-  const double d4 = 0.1333;
-  const double d5 = 0.0997;
-  const double d6 = 0.0996;
-  const double a2 = -0.425;
-  const double a3 = -0.39225;
+Matrix8x6 inverse_kinematics(
+    const Matrix4x4 &desired_EEF_pose, double d1, double d4, double d5, double d6, double a2, double a3) {
   const double alpha1 = M_PI_2;
   const double alpha4 = M_PI_2;
   const double alpha5 = -M_PI_2;
@@ -182,7 +176,7 @@ Matrix8x6 ur5e_inverse_kinematics(Matrix4x4 desired_EEF_pose) {
   }
 
   // At this points, the angles lie in [-2pi, 2pi]
-  // However, we want [0 , 2pi[ take the modulo 2pi and handle the negative values
+  // However, we want [0, 2pi[ so we take the modulo 2pi and handle the negative values
   solutions = solutions.unaryExpr([](const double x) {
     const double y = fmod(x, 2.0 * M_PI);
     if (y > 0.0) {
@@ -190,52 +184,33 @@ Matrix8x6 ur5e_inverse_kinematics(Matrix4x4 desired_EEF_pose) {
     } else {
       return y + 2.0 * M_PI;
     }
-    // else return fmod(x + 4.0 * M_PI, 2.0 * M_PI);
   });
 
   return solutions;
 }
 
-// const auto [theta2a, theta2b] = calculate_theta2(c234, s234, c1, s1, s5, px, py, pz, d1, d5, d6, a2, a3);
-// solutions.col(1).row(i).array() = theta2a;
-// solutions.col(1).row(i + 1).array() = theta2b;
 
-// tuple<double, double> calculate_theta2_equation34(double c234,
-//                                        double s234,
-//                                        double c1,
-//                                        double s1,
-//                                        double s5,
-//                                        double px,
-//                                        double py,
-//                                        double pz,
-//                                        double d1,
-//                                        double d5,
-//                                        double d6,
-//                                        double a2,
-//                                        double a3) {
-//   // Equation (31), (32)
-//   const double A2 = 2 * a2 * (d1 - pz - (d5 * c234) - (d6 * s5 * s234));
-//   const double B2 = 2 * a2 * ((d5 * s234) - (d6 * s5 * c234) - (c1 * px) - (s1 * py));
 
-//   const double H1 = pow(a3, 2) - pow(a2, 2) - pow(d5, 2);
-//   const double H2 = (pz - d1) * ((2 * d5 * c234) + (2 * d6 * s5 * s234) + pz - d1);
-//   const double H3 = (c1 * px) + (s1 * py);
-//   const double H4 = (2 * d5 * s234) - (2 * d6 * s5 * c234) - (c1 * px) - (s1 * py);
-//   const double H5 = pow(d6, 2) * pow(s5, 2);
 
-//   // Equation (33)
-//   const double C2 = H1 - H2 + (H3 * H4) - H5;
+Matrix8x6 ur3e_inverse_kinematics(const Matrix4x4 &desired_EEF_pose) {
+  // UR5e specific DH parameters
+  const double d1 = 0.15185;
+  const double d4 = 0.13105;
+  const double d5 = 0.08535;
+  const double d6 = 0.0921;
+  const double a2 = -0.24355;
+  const double a3 = -0.2132;
+  return inverse_kinematics(desired_EEF_pose, d1, d4, d5, d6, a2, a3);
+}
 
-//   double H6 = pow(A2, 2) + pow(B2, 2) - pow(C2, 2);
-
-//   if (abs(H6) < 1e-12) {  // Threshold chosen arbitrarily
-//     H6 = 0.0;
-//   }
-
-//   const double H7 = atan2(sqrt(H6), C2);
-
-//   // Equation (34)
-//   const double theta2a = atan2(A2, B2) + H7;
-//   const double theta2b = atan2(A2, B2) - H7;
-//   return {theta2a, theta2b};
-// }
+// TODO: consider moving this to a ur5e namespace instead and calling ur5e::inverse_kinematics() etc.
+Matrix8x6 ur5e_inverse_kinematics(const Matrix4x4 &desired_EEF_pose) {
+  // UR5e specific DH parameters
+  const double d1 = 0.1625;
+  const double d4 = 0.1333;
+  const double d5 = 0.0997;
+  const double d6 = 0.0996;
+  const double a2 = -0.425;
+  const double a3 = -0.39225;
+  return inverse_kinematics(desired_EEF_pose, d1, d4, d5, d6, a2, a3);
+}

@@ -25,7 +25,7 @@ To get an EEF pose X that is guaranteed to be reachable, we can run X = F(q) for
 Note: If there's a NaN a row of the IK solution, it means that that row should be ignored
 """
 import pytest
-from ur_analytic_ik import ur5e_forward_kinematics, ur5e_inverse_kinematics
+from ur_analytic_ik import ur5e
 import numpy as np
 
 
@@ -38,36 +38,36 @@ def seed():
 def test_consistency():
     for _ in range(10000):
         random_joints = np.random.uniform(0, 2 * np.pi, 6)
-        eef_pose = ur5e_forward_kinematics(*random_joints)
-        joint_solutions = ur5e_inverse_kinematics(np.array(eef_pose))
+        eef_pose = ur5e.forward_kinematics(*random_joints)
+        joint_solutions = ur5e.inverse_kinematics(np.array(eef_pose))
         joints_solution_valid = [joints for joints in joint_solutions if not np.isnan(np.sum(joints))]
 
         if len(joints_solution_valid) <= 1:
             continue  # A single solution is always consistent with itself
 
-        eef_pose0 = ur5e_forward_kinematics(*joints_solution_valid[0])
+        eef_pose0 = ur5e.forward_kinematics(*joints_solution_valid[0])
         for joints in joints_solution_valid[1:]:
-            eefpose = ur5e_forward_kinematics(*joints)
+            eefpose = ur5e.forward_kinematics(*joints)
             assert np.allclose(eef_pose0, eefpose)
 
 
 def test_correctness():
     for _ in range(10000):
         random_joints = np.random.uniform(0, 2 * np.pi, 6)
-        original_eef_pose = np.array(ur5e_forward_kinematics(*random_joints))
-        joint_solutions = ur5e_inverse_kinematics(original_eef_pose)
+        original_eef_pose = np.array(ur5e.forward_kinematics(*random_joints))
+        joint_solutions = ur5e.inverse_kinematics(original_eef_pose)
         joints_solution_valid = [joints for joints in joint_solutions if not np.isnan(np.sum(joints))]
 
         for joints in joints_solution_valid:
-            eef_pose = np.array(ur5e_forward_kinematics(*joints))
+            eef_pose = np.array(ur5e.forward_kinematics(*joints))
             assert np.allclose(eef_pose, original_eef_pose)
 
 
 def test_inclusion():
     for _ in range(10000):
         random_joints = np.random.uniform(0, 2 * np.pi, 6)
-        eef_pose = ur5e_forward_kinematics(*random_joints)
-        joint_solutions = ur5e_inverse_kinematics(np.array(eef_pose))
+        eef_pose = ur5e.forward_kinematics(*random_joints)
+        joint_solutions = ur5e.inverse_kinematics(np.array(eef_pose))
         joints_solution_valid = [joints for joints in joint_solutions if not np.isnan(np.sum(joints))]
 
         # random_joints should be one of the solutions
@@ -78,7 +78,7 @@ def test_strictness():
     unreachable_pose = np.identity(4)
     unreachable_pose[0, 3] = 5.0
 
-    joint_solutions = ur5e_inverse_kinematics(unreachable_pose)
+    joint_solutions = ur5e.inverse_kinematics(unreachable_pose)
     joints_solution_valid = [joints for joints in joint_solutions if not np.isnan(np.sum(joints))]
 
     assert len(joints_solution_valid) == 0
@@ -92,8 +92,8 @@ def test_strictness():
 def test_range():
     for _ in range(10000):
         random_joints = np.random.uniform(0, 2 * np.pi, 6)
-        eef_pose = ur5e_forward_kinematics(*random_joints)
-        joint_solutions = ur5e_inverse_kinematics(np.array(eef_pose))
+        eef_pose = ur5e.forward_kinematics(*random_joints)
+        joint_solutions = ur5e.inverse_kinematics(np.array(eef_pose))
         joints_solution_valid = [joints for joints in joint_solutions if not np.isnan(np.sum(joints))]
 
         for joints in joints_solution_valid:
@@ -113,12 +113,12 @@ def test_axis_aliged_eef_pose():
     easily_reachable_pose[:3, :3] = top_down_orientation
     easily_reachable_pose[:3, 3] = translation
 
-    joint_solutions = ur5e_inverse_kinematics(np.array(easily_reachable_pose))
+    joint_solutions = ur5e.inverse_kinematics(np.array(easily_reachable_pose))
     joints_solution_valid = [joints for joints in joint_solutions if not np.isnan(np.sum(joints))]
 
     # We chose this "easy" pose where all UR robots should have 8 IK solutions
     assert len(joints_solution_valid) == 8
 
     for joints in joints_solution_valid:
-        eef_pose = np.array(ur5e_forward_kinematics(*joints))
+        eef_pose = np.array(ur5e.forward_kinematics(*joints))
         assert np.allclose(easily_reachable_pose, eef_pose)
