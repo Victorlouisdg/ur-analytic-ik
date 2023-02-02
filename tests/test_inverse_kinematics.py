@@ -17,6 +17,9 @@ There's several properties that we want to test for the IK:
 Additionally there's some conventions that we want to follow:
 * Range: The solutions should be in the range [0, 2pi[
 
+We also have a test with an axis-aligned EEF pose because some solvers seem to have problems with that.
+See: https://github.com/cambel/ur_ikfast/issues/4
+
 To get an EEF pose X that is guaranteed to be reachable, we can run X = F(q) for a q with the joint limits.
 
 Note: If there's a NaN a row of the IK solution, it means that that row should be ignored
@@ -96,3 +99,26 @@ def test_range():
         for joints in joints_solution_valid:
             assert np.all(joints >= 0)
             assert np.all(joints < 2 * np.pi)
+
+
+def test_axis_aliged_eef_pose():
+    easily_reachable_pose = np.identity(4)
+    X = np.array([-1.0, 0.0, 0.0])
+    Y = np.array([0.0, 1.0, 0.0])
+    Z = np.array([0.0, 0.0, -1.0])
+    top_down_orientation = np.column_stack([X, Y, Z])
+
+    translation = np.array([-0.2, -0.2, 0.2])
+
+    easily_reachable_pose[:3, :3] = top_down_orientation
+    easily_reachable_pose[:3, 3] = translation
+
+    joint_solutions = ur5e_inverse_kinematics(np.array(easily_reachable_pose))
+    joints_solution_valid = [joints for joints in joint_solutions if not np.isnan(np.sum(joints))]
+
+    # We chose this "easy" pose where all UR robots should have 8 IK solutions
+    assert len(joints_solution_valid) == 8
+
+    for joints in joints_solution_valid:
+        eef_pose = np.array(ur5e_forward_kinematics(*joints))
+        assert np.allclose(easily_reachable_pose, eef_pose)
