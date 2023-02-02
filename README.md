@@ -26,6 +26,14 @@ from ur_analytic_ik import ur5e_inverse_kinematics
 # Known EEF pose for the UR5e that should have (0, 0, 0, 0, 0, 0) as solution for the joints:
 eef_rotation0 = np.array([[1, 0, 0], [0, 0, -1], [0, 1, 0]])
 eef_translation0 = np.array([-0.8172, -0.2329, 0.0628])
+eef_pose0 = #TODO
 
-solutions = ur5e_inverse_kinematics(eef_rotation0, eef_translation0)
+solutions = ur5e_inverse_kinematics(eef_pose0)
+```
+
+Testing
+-------
+In the root directory of this repo, to run the tests:
+```
+pytest -v
 ```
