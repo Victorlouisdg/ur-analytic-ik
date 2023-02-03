@@ -114,3 +114,19 @@ def test_axis_aliged_eef_pose():
     for joints in joint_solutions:
         eef_pose = np.array(ur5e.forward_kinematics(*joints.T))
         assert np.allclose(easily_reachable_pose, eef_pose)
+
+
+def test_with_tcp():
+    tcp_transform = np.identity(4)
+    tcp_transform[2, 3] = 0.2
+
+    zeros = np.zeros(6)
+
+    tcp_pose = ur5e.forward_kinematics_with_tcp(*zeros, tcp_transform)
+    joint_solutions = ur5e.inverse_kinematics_with_tcp(np.array(tcp_pose), tcp_transform)
+
+    # Check whether all joints are close to zero or two pi.
+    two_pi = 2.0 * np.pi * np.ones(6)
+    assert np.any(
+        [np.logical_or(np.isclose(zeros, joints), np.isclose(two_pi, joints)) for joints in joint_solutions]
+    )

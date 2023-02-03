@@ -12,7 +12,7 @@ tuple<double, double> calculate_theta1(double r13, double r23, double px, double
   const double A1 = px - d6 * r13;
   const double B1 = d6 * r23 - py;
 
-  // I use the letter H for helper variables that don't have a name in the paper.
+  // We use the letter H for helper variables that don't have a name in the paper.
   const double H1 = pow(A1, 2) + pow(B1, 2) - pow(d4, 2);
   const double H2 = atan2(sqrt(H1), d4);
 
@@ -64,7 +64,7 @@ tuple<double, double> calculate_theta3(double KS, double KC, double a2, double a
 
   // Note: Appartenently, H2 can be negative, the sqrt() below then returns NaN.
   // When this happens, we simply keep going and put the NaN in the solutions matrix.
-  // I believe ehis represents a scenario where there are <8 solutions.
+  // I believe this represents a scenario where there are less than 8 solutions.
 
   // Equation (58)
   const double theta3a = atan2(sqrt(H2), H1);
@@ -223,10 +223,20 @@ namespace ur3e {
 vector<Matrix1x6> inverse_kinematics(const Matrix4x4 &desired_EEF_pose) {
   return ur_inverse_kinematics(desired_EEF_pose, d1, d4, d5, d6, a2, a3);
 }
+
+vector<Matrix1x6> inverse_kinematics_with_tcp(const Matrix4x4 &desired_EEF_pose, const Matrix4x4 &tcp_transform) {
+  return inverse_kinematics(desired_EEF_pose * tcp_transform.inverse());
+}
+
 }  // namespace ur3e
 
 namespace ur5e {
 vector<Matrix1x6> inverse_kinematics(const Matrix4x4 &desired_EEF_pose) {
   return ur_inverse_kinematics(desired_EEF_pose, d1, d4, d5, d6, a2, a3);
 }
+
+vector<Matrix1x6> inverse_kinematics_with_tcp(const Matrix4x4 &desired_EEF_pose, const Matrix4x4 &tcp_transform) {
+  return inverse_kinematics(desired_EEF_pose * tcp_transform.inverse());
+}
+
 }  // namespace ur5e

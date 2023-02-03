@@ -1,8 +1,8 @@
 #include "forward_kinematics.hh"
 #include "inverse_kinematics.hh"
 #include <nanobind/nanobind.h>
-#include <nanobind/tensor.h>
 #include <nanobind/stl/vector.h>
+#include <nanobind/tensor.h>
 
 namespace nb = nanobind;
 
@@ -16,6 +16,34 @@ void define_forward_kinematics(nb::module_ &robot_module,
                    [=](double theta1, double theta2, double theta3, double theta4, double theta5, double theta6) {
                      // Call the FK function
                      Matrix4x4 rowMajorMatrix = fk_function(theta1, theta2, theta3, theta4, theta5, theta6);
+
+                     // Copy returned Matrix to array of doubles
+                     size_t shape[2] = {4, 4};
+                     double *double_array = new double[16];
+                     memcpy(double_array, rowMajorMatrix.data(), 16 * sizeof(double));
+                     nb::capsule deleter(double_array, [](void *data) noexcept { delete[](double *) data; });
+
+                     return nb::tensor<nb::numpy, double, nb::shape<4, 4>>(double_array, 2, shape, deleter);
+                   });
+}
+
+void define_forward_kinematics_with_tcp(
+    nb::module_ &robot_module,
+    std::function<Matrix4x4(double, double, double, double, double, double, Matrix4x4)> fk_with_tcp_function) {
+  robot_module.def("forward_kinematics_with_tcp",
+                   [=](double theta1,
+                       double theta2,
+                       double theta3,
+                       double theta4,
+                       double theta5,
+                       double theta6,
+                       nb::tensor<> tcp_transform) {
+                     // Call the FK function
+                     Matrix4x4 tcp_transform_eigen;
+                     memcpy(tcp_transform_eigen.data(), tcp_transform.data(), 16 * sizeof(double));
+
+                     Matrix4x4 rowMajorMatrix = fk_with_tcp_function(
+                         theta1, theta2, theta3, theta4, theta5, theta6, tcp_transform_eigen);
 
                      // Copy returned Matrix to array of doubles
                      size_t shape[2] = {4, 4};
@@ -52,14 +80,48 @@ void define_inverse_kinematics(nb::module_ &robot_module, std::function<vector<M
   });
 }
 
+void define_inverse_kinematics_with_tcp(nb::module_ &robot_module,
+                                        std::function<vector<Matrix1x6>(Matrix4x4, Matrix4x4)> ik_with_tcp_function) {
+  robot_module.def("inverse_kinematics_with_tcp", [=](nb::tensor<> tensor, nb::tensor<> tcp_transform) {
+    // Copy the received tensor to a row-major Eigen matrix
+    Matrix4x4 rowMajorMatrix;
+    memcpy(rowMajorMatrix.data(), tensor.data(), 16 * sizeof(double));
+
+    // Copy the received tcp_transform to a row-major Eigen matrix
+    Matrix4x4 tcp_transform_eigen;
+    memcpy(tcp_transform_eigen.data(), tcp_transform.data(), 16 * sizeof(double));
+
+    // Call the IK function
+    vector<Matrix1x6> solutions = ik_with_tcp_function(rowMajorMatrix, tcp_transform_eigen);
+
+    // Copy returned Matrices into tensors
+    using np_array_1x6 = nb::tensor<nb::numpy, double, nb::shape<1, 6>>;
+    vector<np_array_1x6> vector_numpy;
+    for (auto solution : solutions) {
+      size_t shape[2] = {1, 6};
+      double *double_array = new double[6];
+      memcpy(double_array, solution.data(), 6 * sizeof(double));
+      nb::capsule deleter(double_array, [](void *data) noexcept { delete[](double *) data; });
+      auto tensor = np_array_1x6(double_array, 2, shape, deleter);
+      vector_numpy.push_back(tensor);
+    }
+
+    return vector_numpy;
+  });
+}
+
 NB_MODULE(ur_analytic_ik_ext, m) {
   nb::module_ m_ur3e = m.def_submodule("ur3e", "UR3e module");
-  define_inverse_kinematics(m_ur3e, ur3e::inverse_kinematics);
   define_forward_kinematics(m_ur3e, ur3e::forward_kinematics);
+  define_forward_kinematics_with_tcp(m_ur3e, ur3e::forward_kinematics_with_tcp);
+  define_inverse_kinematics(m_ur3e, ur3e::inverse_kinematics);
+  define_inverse_kinematics_with_tcp(m_ur3e, ur3e::inverse_kinematics_with_tcp);
 
   nb::module_ m_ur5e = m.def_submodule("ur5e", "UR5e module");
-  define_inverse_kinematics(m_ur5e, ur5e::inverse_kinematics);
   define_forward_kinematics(m_ur5e, ur5e::forward_kinematics);
+  define_forward_kinematics_with_tcp(m_ur5e, ur5e::forward_kinematics_with_tcp);
+  define_inverse_kinematics(m_ur5e, ur5e::inverse_kinematics);
+  define_inverse_kinematics_with_tcp(m_ur5e, ur5e::inverse_kinematics_with_tcp);
 
   // This function is mostly still here to understand nanobind.
   // Once we properly handle tensors without copying etc, we can remove this.
