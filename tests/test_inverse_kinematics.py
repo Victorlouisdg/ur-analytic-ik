@@ -66,20 +66,16 @@ def test_inclusion():
         random_joints = np.random.uniform(0, 2 * np.pi, 6)
         eef_pose = ur5e.forward_kinematics(*random_joints)
         joint_solutions = ur5e.inverse_kinematics(np.array(eef_pose))
-        joints_solution_valid = [joints for joints in joint_solutions if not np.isnan(np.sum(joints))]
 
         # random_joints should be one of the solutions
-        assert np.any([np.allclose(random_joints, joints) for joints in joints_solution_valid])
+        assert np.any([np.allclose(random_joints, joints) for joints in joint_solutions])
 
 
 def test_strictness():
     unreachable_pose = np.identity(4)
     unreachable_pose[0, 3] = 5.0
-
     joint_solutions = ur5e.inverse_kinematics(unreachable_pose)
-    joints_solution_valid = [joints for joints in joint_solutions if not np.isnan(np.sum(joints))]
-
-    assert len(joints_solution_valid) == 0
+    assert len(joint_solutions) == 0
 
 
 # Not sure yet if/how  we can test completeness.
@@ -92,9 +88,8 @@ def test_range():
         random_joints = np.random.uniform(0, 2 * np.pi, 6)
         eef_pose = ur5e.forward_kinematics(*random_joints)
         joint_solutions = ur5e.inverse_kinematics(np.array(eef_pose))
-        joints_solution_valid = [joints for joints in joint_solutions if not np.isnan(np.sum(joints))]
 
-        for joints in joints_solution_valid:
+        for joints in joint_solutions:
             assert np.all(joints >= 0)
             assert np.all(joints < 2 * np.pi)
 

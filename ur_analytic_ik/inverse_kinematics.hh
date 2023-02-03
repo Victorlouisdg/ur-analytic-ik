@@ -86,8 +86,8 @@ vector<Matrix1x6> filter_solutions(const Matrix8x6 &solutions) {
 
     // Checking if the solution is valid
     if (not solution.array().isFinite().all()) {
-        continue;
-      }
+      continue;
+    }
 
     // Checking if the solution is unique
     bool is_unique = true;
@@ -106,11 +106,8 @@ vector<Matrix1x6> filter_solutions(const Matrix8x6 &solutions) {
   return valid_unique_solutions;
 }
 
-vector<Matrix1x6> inverse_kinematics(
+vector<Matrix1x6> ur_inverse_kinematics(
     const Matrix4x4 &desired_EEF_pose, double d1, double d4, double d5, double d6, double a2, double a3) {
-  const double alpha1 = M_PI_2;
-  const double alpha4 = M_PI_2;
-  const double alpha5 = -M_PI_2;
 
   // Unpacking the matrix
   const Matrix4x4 &M = desired_EEF_pose;
@@ -220,27 +217,16 @@ vector<Matrix1x6> inverse_kinematics(
   return valid_unique_solutions;
 }
 
+// Robot specifics functions below here.
 
-
-vector<Matrix1x6> ur3e_inverse_kinematics(const Matrix4x4 &desired_EEF_pose) {
-  // UR5e specific DH parameters
-  const double d1 = 0.15185;
-  const double d4 = 0.13105;
-  const double d5 = 0.08535;
-  const double d6 = 0.0921;
-  const double a2 = -0.24355;
-  const double a3 = -0.2132;
-  return inverse_kinematics(desired_EEF_pose, d1, d4, d5, d6, a2, a3);
+namespace ur3e {
+vector<Matrix1x6> inverse_kinematics(const Matrix4x4 &desired_EEF_pose) {
+  return ur_inverse_kinematics(desired_EEF_pose, d1, d4, d5, d6, a2, a3);
 }
+}  // namespace ur3e
 
-// TODO: consider moving this to a ur5e namespace instead and calling ur5e::inverse_kinematics() etc.
-vector<Matrix1x6> ur5e_inverse_kinematics(const Matrix4x4 &desired_EEF_pose) {
-  // UR5e specific DH parameters
-  const double d1 = 0.1625;
-  const double d4 = 0.1333;
-  const double d5 = 0.0997;
-  const double d6 = 0.0996;
-  const double a2 = -0.425;
-  const double a3 = -0.39225;
-  return inverse_kinematics(desired_EEF_pose, d1, d4, d5, d6, a2, a3);
+namespace ur5e {
+vector<Matrix1x6> inverse_kinematics(const Matrix4x4 &desired_EEF_pose) {
+  return ur_inverse_kinematics(desired_EEF_pose, d1, d4, d5, d6, a2, a3);
 }
+}  // namespace ur5e

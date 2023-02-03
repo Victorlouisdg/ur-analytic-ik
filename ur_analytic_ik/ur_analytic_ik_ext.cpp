@@ -54,12 +54,12 @@ void define_inverse_kinematics(nb::module_ &robot_module, std::function<vector<M
 
 NB_MODULE(ur_analytic_ik_ext, m) {
   nb::module_ m_ur3e = m.def_submodule("ur3e", "UR3e module");
-  define_inverse_kinematics(m_ur3e, ur3e_inverse_kinematics);
-  define_forward_kinematics(m_ur3e, ur3e_forward_kinematics);
+  define_inverse_kinematics(m_ur3e, ur3e::inverse_kinematics);
+  define_forward_kinematics(m_ur3e, ur3e::forward_kinematics);
 
   nb::module_ m_ur5e = m.def_submodule("ur5e", "UR5e module");
-  define_inverse_kinematics(m_ur5e, ur5e_inverse_kinematics);
-  define_forward_kinematics(m_ur5e, ur5e_forward_kinematics);
+  define_inverse_kinematics(m_ur5e, ur5e::inverse_kinematics);
+  define_forward_kinematics(m_ur5e, ur5e::forward_kinematics);
 
   // This function is mostly still here to understand nanobind.
   // Once we properly handle tensors without copying etc, we can remove this.
