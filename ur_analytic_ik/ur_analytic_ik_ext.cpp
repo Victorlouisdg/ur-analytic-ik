@@ -2,10 +2,12 @@
 #include "inverse_kinematics.hh"
 #include <nanobind/nanobind.h>
 #include <nanobind/tensor.h>
+#include <nanobind/stl/vector.h>
 
 namespace nb = nanobind;
 
 using namespace nb::literals;
+using namespace std;
 
 // TODO document the how/why of these define functions
 void define_forward_kinematics(nb::module_ &robot_module,
@@ -25,22 +27,28 @@ void define_forward_kinematics(nb::module_ &robot_module,
                    });
 }
 
-void define_inverse_kinematics(nb::module_ &robot_module, std::function<Matrix8x6(Matrix4x4)> ik_function) {
+void define_inverse_kinematics(nb::module_ &robot_module, std::function<vector<Matrix1x6>(Matrix4x4)> ik_function) {
   robot_module.def("inverse_kinematics", [=](nb::tensor<> tensor) {
     // Copy the received tensor to a row-major Eigen matrix
     Matrix4x4 rowMajorMatrix;
     memcpy(rowMajorMatrix.data(), tensor.data(), 16 * sizeof(double));
 
     // Call the IK function
-    Matrix8x6 solutions = ik_function(rowMajorMatrix);
+    vector<Matrix1x6> solutions = ik_function(rowMajorMatrix);
 
-    // Copy returned Matrix to array of doubles
-    size_t shape[2] = {8, 6};
-    double *double_array = new double[48];
-    memcpy(double_array, solutions.data(), 48 * sizeof(double));
-    nb::capsule deleter(double_array, [](void *data) noexcept { delete[](double *) data; });
+    // Copy returned Matrices into tensors
+    using np_array_1x6 = nb::tensor<nb::numpy, double, nb::shape<1, 6>>;
+    vector<np_array_1x6> vector_numpy;
+    for (auto solution : solutions) {
+      size_t shape[2] = {1, 6};
+      double *double_array = new double[6];
+      memcpy(double_array, solution.data(), 6 * sizeof(double));
+      nb::capsule deleter(double_array, [](void *data) noexcept { delete[](double *) data; });
+      auto tensor = np_array_1x6(double_array, 2, shape, deleter);
+      vector_numpy.push_back(tensor);
+    }
 
-    return nb::tensor<nb::numpy, double, nb::shape<8, 6>>(double_array, 2, shape, deleter);
+    return vector_numpy;
   });
 }
 

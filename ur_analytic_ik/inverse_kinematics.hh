@@ -6,6 +6,7 @@ using namespace std;
 
 using Matrix4x4 = Eigen::Matrix<double, 4, 4, Eigen::RowMajor>;
 using Matrix8x6 = Eigen::Matrix<double, 8, 6, Eigen::RowMajor>;
+using Matrix1x6 = Eigen::Matrix<double, 1, 6, Eigen::RowMajor>;
 
 tuple<double, double> calculate_theta1(double r13, double r23, double px, double py, double d4, double d6) {
   const double A1 = px - d6 * r13;
@@ -77,7 +78,35 @@ double calculate_theta2(double KS, double KC, double c3, double s3, double a2, d
   return theta2;
 }
 
-Matrix8x6 inverse_kinematics(
+vector<Matrix1x6> filter_solutions(const Matrix8x6 &solutions) {
+  vector<Matrix1x6> valid_unique_solutions;
+
+  for (int i = 0; i < solutions.rows(); i++) {
+    const Matrix1x6 solution = solutions.row(i);
+
+    // Checking if the solution is valid
+    if (not solution.array().isFinite().all()) {
+        continue;
+      }
+
+    // Checking if the solution is unique
+    bool is_unique = true;
+    for (const auto &valid_unique_solution : valid_unique_solutions) {
+      if ((solution - valid_unique_solution).norm() < 1e-12) {
+        is_unique = false;
+        break;
+      }
+    }
+
+    if (is_unique) {
+      valid_unique_solutions.push_back(solution);
+    }
+  }
+
+  return valid_unique_solutions;
+}
+
+vector<Matrix1x6> inverse_kinematics(
     const Matrix4x4 &desired_EEF_pose, double d1, double d4, double d5, double d6, double a2, double a3) {
   const double alpha1 = M_PI_2;
   const double alpha4 = M_PI_2;
@@ -186,13 +215,14 @@ Matrix8x6 inverse_kinematics(
     }
   });
 
-  return solutions;
+  vector<Matrix1x6> valid_unique_solutions = filter_solutions(solutions);
+
+  return valid_unique_solutions;
 }
 
 
 
-
-Matrix8x6 ur3e_inverse_kinematics(const Matrix4x4 &desired_EEF_pose) {
+vector<Matrix1x6> ur3e_inverse_kinematics(const Matrix4x4 &desired_EEF_pose) {
   // UR5e specific DH parameters
   const double d1 = 0.15185;
   const double d4 = 0.13105;
@@ -204,7 +234,7 @@ Matrix8x6 ur3e_inverse_kinematics(const Matrix4x4 &desired_EEF_pose) {
 }
 
 // TODO: consider moving this to a ur5e namespace instead and calling ur5e::inverse_kinematics() etc.
-Matrix8x6 ur5e_inverse_kinematics(const Matrix4x4 &desired_EEF_pose) {
+vector<Matrix1x6> ur5e_inverse_kinematics(const Matrix4x4 &desired_EEF_pose) {
   // UR5e specific DH parameters
   const double d1 = 0.1625;
   const double d4 = 0.1333;

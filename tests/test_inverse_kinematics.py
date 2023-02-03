@@ -40,14 +40,13 @@ def test_consistency():
         random_joints = np.random.uniform(0, 2 * np.pi, 6)
         eef_pose = ur5e.forward_kinematics(*random_joints)
         joint_solutions = ur5e.inverse_kinematics(np.array(eef_pose))
-        joints_solution_valid = [joints for joints in joint_solutions if not np.isnan(np.sum(joints))]
 
-        if len(joints_solution_valid) <= 1:
+        if len(joint_solutions) <= 1:
             continue  # A single solution is always consistent with itself
 
-        eef_pose0 = ur5e.forward_kinematics(*joints_solution_valid[0])
-        for joints in joints_solution_valid[1:]:
-            eefpose = ur5e.forward_kinematics(*joints)
+        eef_pose0 = ur5e.forward_kinematics(*joint_solutions[0].T)
+        for joints in joint_solutions[1:]:
+            eefpose = ur5e.forward_kinematics(*joints.T)
             assert np.allclose(eef_pose0, eefpose)
 
 
@@ -56,10 +55,9 @@ def test_correctness():
         random_joints = np.random.uniform(0, 2 * np.pi, 6)
         original_eef_pose = np.array(ur5e.forward_kinematics(*random_joints))
         joint_solutions = ur5e.inverse_kinematics(original_eef_pose)
-        joints_solution_valid = [joints for joints in joint_solutions if not np.isnan(np.sum(joints))]
 
-        for joints in joints_solution_valid:
-            eef_pose = np.array(ur5e.forward_kinematics(*joints))
+        for joints in joint_solutions:
+            eef_pose = np.array(ur5e.forward_kinematics(*joints.T))
             assert np.allclose(eef_pose, original_eef_pose)
 
 
@@ -114,11 +112,10 @@ def test_axis_aliged_eef_pose():
     easily_reachable_pose[:3, 3] = translation
 
     joint_solutions = ur5e.inverse_kinematics(np.array(easily_reachable_pose))
-    joints_solution_valid = [joints for joints in joint_solutions if not np.isnan(np.sum(joints))]
 
     # We chose this "easy" pose where all UR robots should have 8 IK solutions
-    assert len(joints_solution_valid) == 8
+    assert len(joint_solutions) == 8
 
-    for joints in joints_solution_valid:
-        eef_pose = np.array(ur5e.forward_kinematics(*joints))
+    for joints in joint_solutions:
+        eef_pose = np.array(ur5e.forward_kinematics(*joints.T))
         assert np.allclose(easily_reachable_pose, eef_pose)
