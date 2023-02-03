@@ -217,6 +217,25 @@ vector<Matrix1x6> ur_inverse_kinematics(
   return valid_unique_solutions;
 }
 
+vector<Matrix1x6> closest_solution(vector<Matrix1x6> &solutions, const Matrix1x6 &joint_angles) {
+  if (solutions.empty()) {
+    return solutions;
+  }
+
+  Matrix1x6 closest_solution = solutions[0];
+  double closest_distance = (joint_angles - closest_solution).norm();
+
+  for (const auto &solution : solutions) {
+    const double distance = (joint_angles - solution).norm();
+    if (distance < closest_distance) {
+      closest_solution = solution;
+      closest_distance = distance;
+    }
+  }
+
+  return {closest_solution};
+}
+
 // Robot specifics functions below here.
 
 namespace ur3e {
@@ -228,6 +247,18 @@ vector<Matrix1x6> inverse_kinematics_with_tcp(const Matrix4x4 &desired_EEF_pose,
   return inverse_kinematics(desired_EEF_pose * tcp_transform.inverse());
 }
 
+vector<Matrix1x6> inverse_kinematics_closest(const Matrix4x4 &desired_EEF_pose,
+                                             double theta1,
+                                             double theta2,
+                                             double theta3,
+                                             double theta4,
+                                             double theta5,
+                                             double theta6) {
+  vector<Matrix1x6> solutions = inverse_kinematics(desired_EEF_pose);
+  Matrix1x6 joint_angles = {theta1, theta2, theta3, theta4, theta5, theta6};
+  return closest_solution(solutions, joint_angles);
+}
+
 }  // namespace ur3e
 
 namespace ur5e {
@@ -237,6 +268,18 @@ vector<Matrix1x6> inverse_kinematics(const Matrix4x4 &desired_EEF_pose) {
 
 vector<Matrix1x6> inverse_kinematics_with_tcp(const Matrix4x4 &desired_EEF_pose, const Matrix4x4 &tcp_transform) {
   return inverse_kinematics(desired_EEF_pose * tcp_transform.inverse());
+}
+
+vector<Matrix1x6> inverse_kinematics_closest(const Matrix4x4 &desired_EEF_pose,
+                                             double theta1,
+                                             double theta2,
+                                             double theta3,
+                                             double theta4,
+                                             double theta5,
+                                             double theta6) {
+  vector<Matrix1x6> solutions = inverse_kinematics(desired_EEF_pose);
+  Matrix1x6 joint_angles = {theta1, theta2, theta3, theta4, theta5, theta6};
+  return closest_solution(solutions, joint_angles);
 }
 
 }  // namespace ur5e
