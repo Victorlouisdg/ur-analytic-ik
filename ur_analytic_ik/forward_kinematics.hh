@@ -85,3 +85,21 @@ Matrix4x4 forward_kinematics_with_tcp(double theta1,
 }
 
 }  // namespace ur5e
+
+namespace ur10e {
+Matrix4x4 forward_kinematics(
+    double theta1, double theta2, double theta3, double theta4, double theta5, double theta6) {
+  return ur_forward_kinematics(theta1, theta2, theta3, theta4, theta5, theta6, d1, d4, d5, d6, a2, a3);
+}
+
+Matrix4x4 forward_kinematics_with_tcp(double theta1,
+                                      double theta2,
+                                      double theta3,
+                                      double theta4,
+                                      double theta5,
+                                      double theta6,
+                                      const Matrix4x4 &tcp_transform) {
+  return forward_kinematics(theta1, theta2, theta3, theta4, theta5, theta6) * tcp_transform;
+}
+
+}  // namespace ur10e

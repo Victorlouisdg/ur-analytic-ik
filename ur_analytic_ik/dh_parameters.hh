@@ -23,3 +23,12 @@ const double d6 = 0.0996;
 const double a2 = -0.425;
 const double a3 = -0.39225;
 }  // namespace ur5e
+
+namespace ur10e {
+const double d1 = 0.1807;
+const double d4 = 0.17415;
+const double d5 = 0.11985;
+const double d6 = 0.11655;
+const double a2 = -0.6127;
+const double a3 = -0.57155;
+}  // namespace ur10e

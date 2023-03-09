@@ -153,6 +153,13 @@ NB_MODULE(ur_analytic_ik_ext, m) {
   define_inverse_kinematics_closest(m_ur5e, ur5e::inverse_kinematics_closest);
   define_inverse_kinematics_with_tcp(m_ur5e, ur5e::inverse_kinematics_with_tcp);
 
+  nb::module_ m_ur10e = m.def_submodule("ur10e", "UR10e module");
+  define_forward_kinematics(m_ur10e, ur10e::forward_kinematics);
+  define_forward_kinematics_with_tcp(m_ur10e, ur10e::forward_kinematics_with_tcp);
+  define_inverse_kinematics(m_ur10e, ur10e::inverse_kinematics);
+  define_inverse_kinematics_closest(m_ur10e, ur10e::inverse_kinematics_closest);
+  define_inverse_kinematics_with_tcp(m_ur10e, ur10e::inverse_kinematics_with_tcp);
+
   // This function is mostly still here to understand nanobind.
   // Once we properly handle tensors without copying etc, we can remove this.
   m.def("inspect", [](nb::tensor<> tensor) {
