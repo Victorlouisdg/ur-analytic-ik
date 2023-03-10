@@ -244,7 +244,16 @@ vector<Matrix1x6> closest_solution(vector<Matrix1x6> &solutions, const Matrix1x6
   double closest_distance = (joint_angles_mapped - closest_solution).norm();
 
   for (const auto &solution : solutions) {
-    const double distance = (joint_angles_mapped - solution).norm();
+    // const double distance = (joint_angles_mapped - solution).norm();
+    double distance = 0.0;
+    for (int i = 0; i < 6; i++) {
+      double difference = std::abs(joint_angles_mapped(i) - solution(i));
+      if (difference > M_PI) {
+        difference = 2.0 * M_PI - difference;
+      }
+      distance += difference;
+    }
+
     if (distance < closest_distance) {
       closest_solution = solution;
       closest_distance = distance;
