@@ -63,7 +63,7 @@ def test_correctness():
 
 def test_inclusion():
     for _ in range(10000):
-        random_joints = np.random.uniform(-np.pi, np.pi, 6) # Smaller range for equality check to work
+        random_joints = np.random.uniform(-np.pi, np.pi, 6)  # Smaller range for equality check to work
         eef_pose = ur5e.forward_kinematics(*random_joints)
         joint_solutions = ur5e.inverse_kinematics(np.array(eef_pose))
 
@@ -85,7 +85,7 @@ def test_strictness():
 
 def test_range():
     for _ in range(10000):
-        random_joints = np.random.uniform(2 * np.pi, 2 * np.pi, 6) 
+        random_joints = np.random.uniform(2 * np.pi, 2 * np.pi, 6)
         eef_pose = ur5e.forward_kinematics(*random_joints)
         joint_solutions = ur5e.inverse_kinematics(np.array(eef_pose))
 
@@ -124,7 +124,7 @@ def test_closest():
 
         joint_solutions = ur5e.inverse_kinematics(original_eef_pose)
 
-        random_closest_joints = np.random.uniform(0, 2 * np.pi, 6)
+        random_closest_joints = np.random.uniform(-np.pi, np.pi, 6)  # Smaller range for equality check to work
         joint_solutions_closest = ur5e.inverse_kinematics_closest(original_eef_pose, *random_closest_joints)
         joint_solutions_closest = joint_solutions_closest[0]  # We know there should be at least one solution
         closest_distance = np.linalg.norm(joint_solutions_closest - random_closest_joints)

@@ -222,18 +222,58 @@ vector<Matrix1x6> closest_solution(vector<Matrix1x6> &solutions, const Matrix1x6
     return solutions;
   }
 
+  // Consider that the user may pass current joints in the range [-2pi, 2pi]
+  // However, the raw solutions are in the range [-pi, pi]
+  // For the convenience of the user, we return the closest solution in the range [-2pi, 2pi]
+  // This requires some care in the distance calculation.
+  // We do this in two stage: first we map the joint_angles to the range [-pi, pi] and find the closest solution.
+  // Then we construct the alternative solution by adding or subtracting 2pi to the closest solution.
+  // Finally, for each angle we pick the one that is closer to the original joint_angles.
+
+  Matrix1x6 joint_angles_mapped = joint_angles.unaryExpr([](const double x) {
+    const double y = fmod(x, 2.0 * M_PI);
+    if (y > M_PI) {
+      return y - 2.0 * M_PI;
+    } else if (y < -M_PI) {
+      return y + 2.0 * M_PI;
+    } 
+    return y;
+  });
+
   Matrix1x6 closest_solution = solutions[0];
-  double closest_distance = (joint_angles - closest_solution).norm();
+  double closest_distance = (joint_angles_mapped - closest_solution).norm();
 
   for (const auto &solution : solutions) {
-    const double distance = (joint_angles - solution).norm();
+    const double distance = (joint_angles_mapped - solution).norm();
     if (distance < closest_distance) {
       closest_solution = solution;
       closest_distance = distance;
     }
   }
 
-  return {closest_solution};
+  // Alternative solution is either +2pi or -2pi depending on the sign of the closest solution.
+  Matrix1x6 alternative_solution = closest_solution.unaryExpr([](const double x) {
+    if (x > 0) {
+      return x + 2.0 * M_PI;
+    } else {
+      return x - 2.0 * M_PI;
+    }
+  });
+
+
+  // Final solutions contains the closest of closest_solution and alternative_solution.
+  Matrix1x6 final_solution;
+  for (int i = 0; i < 6; i++) {
+    double difference_to_closest = std::abs(closest_solution(i) - joint_angles(i));
+    double difference_to_alternative = std::abs(alternative_solution(i) - joint_angles(i));
+    if (difference_to_closest < difference_to_alternative) {
+      final_solution(i) = closest_solution(i);
+    } else {
+      final_solution(i) = alternative_solution(i);
+    }
+  }
+
+  return {final_solution};
 }
 
 // Robot specifics functions below here.
