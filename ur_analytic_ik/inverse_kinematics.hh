@@ -202,16 +202,16 @@ vector<Matrix1x6> ur_inverse_kinematics(
   }
 
   // At this points, the angles lie in [-2pi, 2pi]
-  // However, we want [0, 2pi[ so we take the modulo 2pi and handle the negative values
+  // However, for standardization we map them to [-pi, pi]
   solutions = solutions.unaryExpr([](const double x) {
-    const double y = fmod(x, 2.0 * M_PI);
-    if (y > 0.0) {
-      return y;
-    } else {
+    const double y = fmod(x, 2.0 * M_PI); // Not 100% sure if this is necessary, but the tests failed without it.
+    if (y > M_PI) {
+      return y - 2.0 * M_PI;
+    } else if (y < -M_PI) {
       return y + 2.0 * M_PI;
-    }
+    } 
+    return y;
   });
-
   vector<Matrix1x6> valid_unique_solutions = filter_solutions(solutions);
 
   return valid_unique_solutions;
@@ -259,6 +259,17 @@ vector<Matrix1x6> inverse_kinematics_closest(const Matrix4x4 &desired_EEF_pose,
   return closest_solution(solutions, joint_angles);
 }
 
+vector<Matrix1x6> inverse_kinematics_closest_with_tcp(const Matrix4x4 &desired_EEF_pose,
+                                                      const Matrix4x4 &tcp_transform,
+                                                      double theta1,
+                                                      double theta2,
+                                                      double theta3,
+                                                      double theta4,
+                                                      double theta5,
+                                                      double theta6) {
+  return inverse_kinematics_closest(
+      desired_EEF_pose * tcp_transform.inverse(), theta1, theta2, theta3, theta4, theta5, theta6);
+}
 }  // namespace ur3e
 
 namespace ur5e {
@@ -282,6 +293,18 @@ vector<Matrix1x6> inverse_kinematics_closest(const Matrix4x4 &desired_EEF_pose,
   return closest_solution(solutions, joint_angles);
 }
 
+vector<Matrix1x6> inverse_kinematics_closest_with_tcp(const Matrix4x4 &desired_EEF_pose,
+                                                      const Matrix4x4 &tcp_transform,
+                                                      double theta1,
+                                                      double theta2,
+                                                      double theta3,
+                                                      double theta4,
+                                                      double theta5,
+                                                      double theta6) {
+  return inverse_kinematics_closest(
+      desired_EEF_pose * tcp_transform.inverse(), theta1, theta2, theta3, theta4, theta5, theta6);
+}
+
 }  // namespace ur5e
 
 namespace ur10e {
@@ -303,6 +326,18 @@ vector<Matrix1x6> inverse_kinematics_closest(const Matrix4x4 &desired_EEF_pose,
   vector<Matrix1x6> solutions = inverse_kinematics(desired_EEF_pose);
   Matrix1x6 joint_angles = {theta1, theta2, theta3, theta4, theta5, theta6};
   return closest_solution(solutions, joint_angles);
+}
+
+vector<Matrix1x6> inverse_kinematics_closest_with_tcp(const Matrix4x4 &desired_EEF_pose,
+                                                      const Matrix4x4 &tcp_transform,
+                                                      double theta1,
+                                                      double theta2,
+                                                      double theta3,
+                                                      double theta4,
+                                                      double theta5,
+                                                      double theta6) {
+  return inverse_kinematics_closest(
+      desired_EEF_pose * tcp_transform.inverse(), theta1, theta2, theta3, theta4, theta5, theta6);
 }
 
 }  // namespace ur10e

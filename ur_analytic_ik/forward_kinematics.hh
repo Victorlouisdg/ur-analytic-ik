@@ -34,22 +34,6 @@ Matrix4x4 ur_forward_kinematics(double theta1,
   return T01 * T12 * T23 * T34 * T45 * T56;
 }
 
-// Matrix4x4 forward_kinematics_with_tcp(double theta1,
-//                                       double theta2,
-//                                       double theta3,
-//                                       double theta4,
-//                                       double theta5,
-//                                       double theta6,
-//                                       double d1,
-//                                       double d4,
-//                                       double d5,
-//                                       double d6,
-//                                       double a2,
-//                                       double a3,
-//                                       const Matrix4x4 &tcp_transform) {
-//   return forward_kinematics(theta1, theta2, theta3, theta4, theta5, theta6, d1, d4, d5, d6, a2, a3) * tcp_transform;
-// }
-
 namespace ur3e {
 Matrix4x4 forward_kinematics(
     double theta1, double theta2, double theta3, double theta4, double theta5, double theta6) {

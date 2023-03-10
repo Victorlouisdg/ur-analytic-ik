@@ -84,13 +84,20 @@ void define_inverse_kinematics_closest(
     nb::module_ &robot_module,
     std::function<vector<Matrix1x6>(Matrix4x4, double, double, double, double, double, double)> ik_closest_function) {
   robot_module.def("inverse_kinematics_closest",
-                   [=](nb::tensor<> tensor, double theta1, double theta2, double theta3, double theta4, double theta5, double theta6) {
+                   [=](nb::tensor<> tensor,
+                       double theta1,
+                       double theta2,
+                       double theta3,
+                       double theta4,
+                       double theta5,
+                       double theta6) {
                      // Copy the received tensor to a row-major Eigen matrix
                      Matrix4x4 rowMajorMatrix;
                      memcpy(rowMajorMatrix.data(), tensor.data(), 16 * sizeof(double));
 
                      // Call the IK function
-                     vector<Matrix1x6> solutions = ik_closest_function(rowMajorMatrix, theta1, theta2, theta3, theta4, theta5, theta6);
+                     vector<Matrix1x6> solutions = ik_closest_function(
+                         rowMajorMatrix, theta1, theta2, theta3, theta4, theta5, theta6);
 
                      // Copy returned Matrices into tensors
                      using np_array_1x6 = nb::tensor<nb::numpy, double, nb::shape<1, 6>>;
@@ -138,6 +145,47 @@ void define_inverse_kinematics_with_tcp(nb::module_ &robot_module,
   });
 }
 
+void define_inverse_kinematics_closest_with_tcp(
+    nb::module_ &robot_module,
+    std::function<vector<Matrix1x6>(Matrix4x4, Matrix4x4, double, double, double, double, double, double)>
+        ik_closest_with_tcp_function) {
+  robot_module.def("inverse_kinematics_closest_with_tcp",
+                   [=](nb::tensor<> tensor,
+                       nb::tensor<> tcp_transform,
+                       double theta1,
+                       double theta2,
+                       double theta3,
+                       double theta4,
+                       double theta5,
+                       double theta6) {
+                     // Copy the received tensor to a row-major Eigen matrix
+                     Matrix4x4 rowMajorMatrix;
+                     memcpy(rowMajorMatrix.data(), tensor.data(), 16 * sizeof(double));
+
+                     // Copy the received tcp_transform to a row-major Eigen matrix
+                     Matrix4x4 tcp_transform_eigen;
+                     memcpy(tcp_transform_eigen.data(), tcp_transform.data(), 16 * sizeof(double));
+
+                     // Call the IK function
+                     vector<Matrix1x6> solutions = ik_closest_with_tcp_function(
+                         rowMajorMatrix, tcp_transform_eigen, theta1, theta2, theta3, theta4, theta5, theta6);
+
+                     // Copy returned Matrices into tensors
+                     using np_array_1x6 = nb::tensor<nb::numpy, double, nb::shape<1, 6>>;
+                     vector<np_array_1x6> vector_numpy;
+                     for (auto solution : solutions) {
+                       size_t shape[2] = {1, 6};
+                       double *double_array = new double[6];
+                       memcpy(double_array, solution.data(), 6 * sizeof(double));
+                       nb::capsule deleter(double_array, [](void *data) noexcept { delete[](double *) data; });
+                       auto tensor = np_array_1x6(double_array, 2, shape, deleter);
+                       vector_numpy.push_back(tensor);
+                     }
+
+                     return vector_numpy;
+                   });
+}
+
 NB_MODULE(ur_analytic_ik_ext, m) {
   nb::module_ m_ur3e = m.def_submodule("ur3e", "UR3e module");
   define_forward_kinematics(m_ur3e, ur3e::forward_kinematics);
@@ -145,6 +193,7 @@ NB_MODULE(ur_analytic_ik_ext, m) {
   define_inverse_kinematics(m_ur3e, ur3e::inverse_kinematics);
   define_inverse_kinematics_closest(m_ur3e, ur3e::inverse_kinematics_closest);
   define_inverse_kinematics_with_tcp(m_ur3e, ur3e::inverse_kinematics_with_tcp);
+  define_inverse_kinematics_closest_with_tcp(m_ur3e, ur3e::inverse_kinematics_closest_with_tcp);
 
   nb::module_ m_ur5e = m.def_submodule("ur5e", "UR5e module");
   define_forward_kinematics(m_ur5e, ur5e::forward_kinematics);
@@ -152,6 +201,7 @@ NB_MODULE(ur_analytic_ik_ext, m) {
   define_inverse_kinematics(m_ur5e, ur5e::inverse_kinematics);
   define_inverse_kinematics_closest(m_ur5e, ur5e::inverse_kinematics_closest);
   define_inverse_kinematics_with_tcp(m_ur5e, ur5e::inverse_kinematics_with_tcp);
+  define_inverse_kinematics_closest_with_tcp(m_ur5e, ur5e::inverse_kinematics_closest_with_tcp);
 
   nb::module_ m_ur10e = m.def_submodule("ur10e", "UR10e module");
   define_forward_kinematics(m_ur10e, ur10e::forward_kinematics);
@@ -159,6 +209,7 @@ NB_MODULE(ur_analytic_ik_ext, m) {
   define_inverse_kinematics(m_ur10e, ur10e::inverse_kinematics);
   define_inverse_kinematics_closest(m_ur10e, ur10e::inverse_kinematics_closest);
   define_inverse_kinematics_with_tcp(m_ur10e, ur10e::inverse_kinematics_with_tcp);
+  define_inverse_kinematics_closest_with_tcp(m_ur10e, ur10e::inverse_kinematics_closest_with_tcp);
 
   // This function is mostly still here to understand nanobind.
   // Once we properly handle tensors without copying etc, we can remove this.
