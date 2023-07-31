@@ -51,11 +51,10 @@ elseif (MSVC)
 endif()
 
 # Create CMake targets for all Python components needed by nanobind
-if (CMAKE_VERSION VERSION_GREATER_EQUAL 3.26)
-    find_package(Python 3.8 COMPONENTS Interpreter Development.Module Development.SABIModule REQUIRED)
-else()
-    find_package(Python 3.8 COMPONENTS Interpreter Development.Module REQUIRED)
-endif()
+    # Try to import all Python components potentially needed by nanobind
+find_package(Python 3.8
+            REQUIRED COMPONENTS Interpreter Development.Module
+            OPTIONAL_COMPONENTS Development.SABIModule)
 
 # Run `nanobind.cmake_dir()` from Python to detect where nanobind is installed
 execute_process(
@@ -64,12 +63,6 @@ execute_process(
         OUTPUT_VARIABLE _tmp_dir
         OUTPUT_STRIP_TRAILING_WHITESPACE COMMAND_ECHO STDOUT)
 list(APPEND CMAKE_PREFIX_PATH "${_tmp_dir}")
-
-
-# Try to import all Python components potentially needed by nanobind
-find_package(Python 3.9
-        REQUIRED COMPONENTS Interpreter Development.Module
-        OPTIONAL_COMPONENTS Development.SABIModule)
 
 # Now, import nanobind through CMake's find_package mechanism
 find_package(nanobind CONFIG REQUIRED)
