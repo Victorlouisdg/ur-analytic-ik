@@ -7,3 +7,10 @@ build
 *.egg-info
 .vscode
 .vs
+
+# ignore files associated with CLion IDE
+.idea
+CMakeFiles
+cmake-build-debug
+.cmake
+CMakeCache.txt
