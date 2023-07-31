@@ -13,7 +13,7 @@ build-backend = "scikit_build_core.build"
 [project]
 name = "ur_analytic_ik"
 version = "0.0.1"
-description="C++ implementation with Python bindings of analytic forward and inverse kinematics for the Universal Robots."
+description = "C++ implementation with Python bindings of analytic forward and inverse kinematics for the Universal Robots."
 readme = "README.md"
 requires-python = ">=3.8"
 authors = [
@@ -33,3 +33,8 @@ build-dir = "build/{wheel_tag}"
 [tool.cibuildwheel]
 # Necessary to see build output from the actual compilation
 build-verbosity = 1
+
+
+# Needed for full C++17 support
+[tool.cibuildwheel.macos.environment]
+MACOSX_DEPLOYMENT_TARGET = "10.14"
