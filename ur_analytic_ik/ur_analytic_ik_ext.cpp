@@ -2,7 +2,7 @@
 #include "inverse_kinematics.hh"
 #include <nanobind/nanobind.h>
 #include <nanobind/stl/vector.h>
-#include <nanobind/tensor.h>
+#include <nanobind/ndarray.h>
 
 namespace nb = nanobind;
 
@@ -23,7 +23,7 @@ void define_forward_kinematics(nb::module_ &robot_module,
                      memcpy(double_array, rowMajorMatrix.data(), 16 * sizeof(double));
                      nb::capsule deleter(double_array, [](void *data) noexcept { delete[](double *) data; });
 
-                     return nb::tensor<nb::numpy, double, nb::shape<4, 4>>(double_array, 2, shape, deleter);
+                     return nb::ndarray<nb::numpy, double, nb::shape<4, 4>>(double_array, 2, shape, deleter);
                    });
 }
 
@@ -37,7 +37,7 @@ void define_forward_kinematics_with_tcp(
                        double theta4,
                        double theta5,
                        double theta6,
-                       nb::tensor<> tcp_transform) {
+                       nb::ndarray<> tcp_transform) {
                      // Call the FK function
                      Matrix4x4 tcp_transform_eigen;
                      memcpy(tcp_transform_eigen.data(), tcp_transform.data(), 16 * sizeof(double));
@@ -51,12 +51,12 @@ void define_forward_kinematics_with_tcp(
                      memcpy(double_array, rowMajorMatrix.data(), 16 * sizeof(double));
                      nb::capsule deleter(double_array, [](void *data) noexcept { delete[](double *) data; });
 
-                     return nb::tensor<nb::numpy, double, nb::shape<4, 4>>(double_array, 2, shape, deleter);
+                     return nb::ndarray<nb::numpy, double, nb::shape<4, 4>>(double_array, 2, shape, deleter);
                    });
 }
 
 void define_inverse_kinematics(nb::module_ &robot_module, std::function<vector<Matrix1x6>(Matrix4x4)> ik_function) {
-  robot_module.def("inverse_kinematics", [=](nb::tensor<> tensor) {
+  robot_module.def("inverse_kinematics", [=](nb::ndarray<> tensor) {
     // Copy the received tensor to a row-major Eigen matrix
     Matrix4x4 rowMajorMatrix;
     memcpy(rowMajorMatrix.data(), tensor.data(), 16 * sizeof(double));
@@ -65,7 +65,7 @@ void define_inverse_kinematics(nb::module_ &robot_module, std::function<vector<M
     vector<Matrix1x6> solutions = ik_function(rowMajorMatrix);
 
     // Copy returned Matrices into tensors
-    using np_array_1x6 = nb::tensor<nb::numpy, double, nb::shape<1, 6>>;
+    using np_array_1x6 = nb::ndarray<nb::numpy, double, nb::shape<1, 6>>;
     vector<np_array_1x6> vector_numpy;
     for (auto solution : solutions) {
       size_t shape[2] = {1, 6};
@@ -84,7 +84,7 @@ void define_inverse_kinematics_closest(
     nb::module_ &robot_module,
     std::function<vector<Matrix1x6>(Matrix4x4, double, double, double, double, double, double)> ik_closest_function) {
   robot_module.def("inverse_kinematics_closest",
-                   [=](nb::tensor<> tensor,
+                   [=](nb::ndarray<> tensor,
                        double theta1,
                        double theta2,
                        double theta3,
@@ -100,7 +100,7 @@ void define_inverse_kinematics_closest(
                          rowMajorMatrix, theta1, theta2, theta3, theta4, theta5, theta6);
 
                      // Copy returned Matrices into tensors
-                     using np_array_1x6 = nb::tensor<nb::numpy, double, nb::shape<1, 6>>;
+                     using np_array_1x6 = nb::ndarray<nb::numpy, double, nb::shape<1, 6>>;
                      vector<np_array_1x6> vector_numpy;
                      for (auto solution : solutions) {
                        size_t shape[2] = {1, 6};
@@ -117,7 +117,7 @@ void define_inverse_kinematics_closest(
 
 void define_inverse_kinematics_with_tcp(nb::module_ &robot_module,
                                         std::function<vector<Matrix1x6>(Matrix4x4, Matrix4x4)> ik_with_tcp_function) {
-  robot_module.def("inverse_kinematics_with_tcp", [=](nb::tensor<> tensor, nb::tensor<> tcp_transform) {
+  robot_module.def("inverse_kinematics_with_tcp", [=](nb::ndarray<> tensor, nb::ndarray<> tcp_transform) {
     // Copy the received tensor to a row-major Eigen matrix
     Matrix4x4 rowMajorMatrix;
     memcpy(rowMajorMatrix.data(), tensor.data(), 16 * sizeof(double));
@@ -130,7 +130,7 @@ void define_inverse_kinematics_with_tcp(nb::module_ &robot_module,
     vector<Matrix1x6> solutions = ik_with_tcp_function(rowMajorMatrix, tcp_transform_eigen);
 
     // Copy returned Matrices into tensors
-    using np_array_1x6 = nb::tensor<nb::numpy, double, nb::shape<1, 6>>;
+    using np_array_1x6 = nb::ndarray<nb::numpy, double, nb::shape<1, 6>>;
     vector<np_array_1x6> vector_numpy;
     for (auto solution : solutions) {
       size_t shape[2] = {1, 6};
@@ -150,8 +150,8 @@ void define_inverse_kinematics_closest_with_tcp(
     std::function<vector<Matrix1x6>(Matrix4x4, Matrix4x4, double, double, double, double, double, double)>
         ik_closest_with_tcp_function) {
   robot_module.def("inverse_kinematics_closest_with_tcp",
-                   [=](nb::tensor<> tensor,
-                       nb::tensor<> tcp_transform,
+                   [=](nb::ndarray<> tensor,
+                       nb::ndarray<> tcp_transform,
                        double theta1,
                        double theta2,
                        double theta3,
@@ -171,7 +171,7 @@ void define_inverse_kinematics_closest_with_tcp(
                          rowMajorMatrix, tcp_transform_eigen, theta1, theta2, theta3, theta4, theta5, theta6);
 
                      // Copy returned Matrices into tensors
-                     using np_array_1x6 = nb::tensor<nb::numpy, double, nb::shape<1, 6>>;
+                     using np_array_1x6 = nb::ndarray<nb::numpy, double, nb::shape<1, 6>>;
                      vector<np_array_1x6> vector_numpy;
                      for (auto solution : solutions) {
                        size_t shape[2] = {1, 6};
@@ -213,7 +213,7 @@ NB_MODULE(ur_analytic_ik_ext, m) {
 
   // This function is mostly still here to understand nanobind.
   // Once we properly handle tensors without copying etc, we can remove this.
-  m.def("inspect", [](nb::tensor<> tensor) {
+  m.def("inspect", [](nb::ndarray<> tensor) {
     printf("Tensor data pointer : %p\n", tensor.data());
     printf("Tensor dimension : %zu\n", tensor.ndim());
     for (size_t i = 0; i < tensor.ndim(); ++i) {
