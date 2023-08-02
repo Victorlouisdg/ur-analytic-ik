@@ -14,3 +14,6 @@ CMakeFiles
 cmake-build-debug
 .cmake
 CMakeCache.txt
+notebooks/.ipynb_checkpoints/
+
+_deps/
