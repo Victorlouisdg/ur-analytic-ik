@@ -1,3 +1,4 @@
+#pragma once
 #include <math.h>
 
 namespace ur {
@@ -5,6 +6,7 @@ const double alpha1 = M_PI_2;
 const double alpha4 = M_PI_2;
 const double alpha5 = -M_PI_2;
 }  // namespace ur
+#pragma once
 
 namespace ur3e {
 const double d1 = 0.1519;

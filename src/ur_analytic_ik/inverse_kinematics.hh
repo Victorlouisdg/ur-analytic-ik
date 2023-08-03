@@ -1,4 +1,9 @@
+#pragma once
+
+#include "dh_parameters.hh"
+#include "utils.h"
 #include <Eigen/Core>
+#include <Eigen/LU>
 #include <iostream>
 #include <math.h>
 
@@ -62,7 +67,7 @@ tuple<double, double> calculate_theta3(double KS, double KC, double a2, double a
     H2 = 0.0;
   }
 
-  // Note: Appartenently, H2 can be negative, the sqrt() below then returns NaN.
+  // Note: Apparently, H2 can be negative, the sqrt() below then returns NaN.
   // When this happens, we simply keep going and put the NaN in the solutions matrix.
   // I believe this represents a scenario where there are less than 8 solutions.
 
@@ -135,9 +140,14 @@ vector<Matrix1x6> ur_inverse_kinematics(
 
     const double s5a = sin(theta5a);
     const double s5b = sin(theta5b);
-    const double sign5a = s5a / abs(s5a);
-    const double sign5b = s5b / abs(s5b);
+    double sign5a = s5a / abs(s5a);
+    double sign5b = s5b / abs(s5b);
 
+    // s5a and s5b can be both zero, then lets put +0 always in 'a' and negative zero in 'b'
+    if (abs(s5a - 0.0) <= 1e-12){
+      sign5a = 1;
+      sign5b = -1;
+    }
     const double theta6a = calculate_theta6(sign5a, c1, s1, r11, r12, r21, r22);
     const double theta6b = calculate_theta6(sign5b, c1, s1, r11, r12, r21, r22);
 
@@ -178,7 +188,6 @@ vector<Matrix1x6> ur_inverse_kinematics(
     const double KS = pz - d1 + (c234 * d5) + (s234 * s5 * d6);
 
     const auto [theta3a, theta3b] = calculate_theta3(KS, KC, a2, a3);
-
     // Calculating theta2
     const double c3a = cos(theta3a);
     const double s3a = sin(theta3a);

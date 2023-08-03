@@ -65,6 +65,14 @@ In the root directory of this repo, to run the tests:
 pytest -v
 ```
 
+Development
+--------------------
+Some linux users have eigen installed at /usr/include/eigen3 instead of /usr/include/Eigen. Symlink it:
+```
+sudo ln -sf /usr/include/eigen3/Eigen /usr/include/Eigen
+sudo ln -sf /usr/include/eigen3/unsupported /usr/include/unsupported
+```
+
 Welcome Improvements
 --------------------
 

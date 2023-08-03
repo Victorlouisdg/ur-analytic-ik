@@ -1,3 +1,4 @@
+#pragma once
 #include "dh_parameters.hh"
 #include <Eigen/Dense>
 

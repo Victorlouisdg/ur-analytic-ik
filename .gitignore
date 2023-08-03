@@ -17,3 +17,13 @@ CMakeCache.txt
 notebooks/.ipynb_checkpoints/
 
 _deps/
+
+Testing/Temporary/
+
+cmake_install.cmake
+
+.ninja_deps
+
+.ninja_log
+
+build.ninja
