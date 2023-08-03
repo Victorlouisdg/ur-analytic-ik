@@ -94,7 +94,7 @@ else () # pip install is called, this should be the default
             NB_STATIC
 
             # Source code goes here
-            ur_analytic_ik/ur_analytic_ik_ext.cpp
+            src/ur_analytic_ik/ur_analytic_ik_ext.cpp
     )
 
     list(PREPEND CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/cmake)
