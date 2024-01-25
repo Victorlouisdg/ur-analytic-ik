@@ -1,4 +1,9 @@
+#pragma once
+
+#include "dh_parameters.hh"
+#include "utils.h"
 #include <Eigen/Core>
+#include <Eigen/LU>
 #include <iostream>
 #include <math.h>
 
@@ -62,7 +67,7 @@ tuple<double, double> calculate_theta3(double KS, double KC, double a2, double a
     H2 = 0.0;
   }
 
-  // Note: Appartenently, H2 can be negative, the sqrt() below then returns NaN.
+  // Note: Apparently, H2 can be negative, the sqrt() below then returns NaN.
   // When this happens, we simply keep going and put the NaN in the solutions matrix.
   // I believe this represents a scenario where there are less than 8 solutions.
 
@@ -78,8 +83,8 @@ double calculate_theta2(double KS, double KC, double c3, double s3, double a2, d
   return theta2;
 }
 
-vector<Matrix1x6> filter_solutions(const Matrix8x6 &solutions) {
-  vector<Matrix1x6> valid_unique_solutions;
+std::vector<Matrix1x6> filter_solutions(const Matrix8x6 &solutions) {
+  std::vector<Matrix1x6> valid_unique_solutions;
 
   for (int i = 0; i < solutions.rows(); i++) {
     const Matrix1x6 solution = solutions.row(i);
@@ -106,7 +111,7 @@ vector<Matrix1x6> filter_solutions(const Matrix8x6 &solutions) {
   return valid_unique_solutions;
 }
 
-vector<Matrix1x6> ur_inverse_kinematics(
+std::vector<Matrix1x6> ur_inverse_kinematics(
     const Matrix4x4 &desired_EEF_pose, double d1, double d4, double d5, double d6, double a2, double a3) {
 
   // Unpacking the matrix
@@ -135,9 +140,14 @@ vector<Matrix1x6> ur_inverse_kinematics(
 
     const double s5a = sin(theta5a);
     const double s5b = sin(theta5b);
-    const double sign5a = s5a / abs(s5a);
-    const double sign5b = s5b / abs(s5b);
+    double sign5a = s5a / abs(s5a);
+    double sign5b = s5b / abs(s5b);
 
+    // s5a and s5b can be both zero, then lets put +0 always in 'a' and negative zero in 'b'
+    if (abs(s5a - 0.0) <= 1e-12){
+      sign5a = 1;
+      sign5b = -1;
+    }
     const double theta6a = calculate_theta6(sign5a, c1, s1, r11, r12, r21, r22);
     const double theta6b = calculate_theta6(sign5b, c1, s1, r11, r12, r21, r22);
 
@@ -178,7 +188,6 @@ vector<Matrix1x6> ur_inverse_kinematics(
     const double KS = pz - d1 + (c234 * d5) + (s234 * s5 * d6);
 
     const auto [theta3a, theta3b] = calculate_theta3(KS, KC, a2, a3);
-
     // Calculating theta2
     const double c3a = cos(theta3a);
     const double s3a = sin(theta3a);
@@ -212,12 +221,12 @@ vector<Matrix1x6> ur_inverse_kinematics(
     } 
     return y;
   });
-  vector<Matrix1x6> valid_unique_solutions = filter_solutions(solutions);
+  std::vector<Matrix1x6> valid_unique_solutions = filter_solutions(solutions);
 
   return valid_unique_solutions;
 }
 
-vector<Matrix1x6> closest_solution(vector<Matrix1x6> &solutions, const Matrix1x6 &joint_angles) {
+std::vector<Matrix1x6> closest_solution(std::vector<Matrix1x6> &solutions, const Matrix1x6 &joint_angles) {
   if (solutions.empty()) {
     return solutions;
   }
@@ -288,27 +297,27 @@ vector<Matrix1x6> closest_solution(vector<Matrix1x6> &solutions, const Matrix1x6
 // Robot specifics functions below here.
 
 namespace ur3e {
-vector<Matrix1x6> inverse_kinematics(const Matrix4x4 &desired_EEF_pose) {
+std::vector<Matrix1x6> inverse_kinematics(const Matrix4x4 &desired_EEF_pose) {
   return ur_inverse_kinematics(desired_EEF_pose, d1, d4, d5, d6, a2, a3);
 }
 
-vector<Matrix1x6> inverse_kinematics_with_tcp(const Matrix4x4 &desired_EEF_pose, const Matrix4x4 &tcp_transform) {
+std::vector<Matrix1x6> inverse_kinematics_with_tcp(const Matrix4x4 &desired_EEF_pose, const Matrix4x4 &tcp_transform) {
   return inverse_kinematics(desired_EEF_pose * tcp_transform.inverse());
 }
 
-vector<Matrix1x6> inverse_kinematics_closest(const Matrix4x4 &desired_EEF_pose,
+std::vector<Matrix1x6> inverse_kinematics_closest(const Matrix4x4 &desired_EEF_pose,
                                              double theta1,
                                              double theta2,
                                              double theta3,
                                              double theta4,
                                              double theta5,
                                              double theta6) {
-  vector<Matrix1x6> solutions = inverse_kinematics(desired_EEF_pose);
+  std::vector<Matrix1x6> solutions = inverse_kinematics(desired_EEF_pose);
   Matrix1x6 joint_angles = {theta1, theta2, theta3, theta4, theta5, theta6};
   return closest_solution(solutions, joint_angles);
 }
 
-vector<Matrix1x6> inverse_kinematics_closest_with_tcp(const Matrix4x4 &desired_EEF_pose,
+std::vector<Matrix1x6> inverse_kinematics_closest_with_tcp(const Matrix4x4 &desired_EEF_pose,
                                                       const Matrix4x4 &tcp_transform,
                                                       double theta1,
                                                       double theta2,
@@ -322,27 +331,27 @@ vector<Matrix1x6> inverse_kinematics_closest_with_tcp(const Matrix4x4 &desired_E
 }  // namespace ur3e
 
 namespace ur5e {
-vector<Matrix1x6> inverse_kinematics(const Matrix4x4 &desired_EEF_pose) {
+std::vector<Matrix1x6> inverse_kinematics(const Matrix4x4 &desired_EEF_pose) {
   return ur_inverse_kinematics(desired_EEF_pose, d1, d4, d5, d6, a2, a3);
 }
 
-vector<Matrix1x6> inverse_kinematics_with_tcp(const Matrix4x4 &desired_EEF_pose, const Matrix4x4 &tcp_transform) {
+std::vector<Matrix1x6> inverse_kinematics_with_tcp(const Matrix4x4 &desired_EEF_pose, const Matrix4x4 &tcp_transform) {
   return inverse_kinematics(desired_EEF_pose * tcp_transform.inverse());
 }
 
-vector<Matrix1x6> inverse_kinematics_closest(const Matrix4x4 &desired_EEF_pose,
+std::vector<Matrix1x6> inverse_kinematics_closest(const Matrix4x4 &desired_EEF_pose,
                                              double theta1,
                                              double theta2,
                                              double theta3,
                                              double theta4,
                                              double theta5,
                                              double theta6) {
-  vector<Matrix1x6> solutions = inverse_kinematics(desired_EEF_pose);
+  std::vector<Matrix1x6> solutions = inverse_kinematics(desired_EEF_pose);
   Matrix1x6 joint_angles = {theta1, theta2, theta3, theta4, theta5, theta6};
   return closest_solution(solutions, joint_angles);
 }
 
-vector<Matrix1x6> inverse_kinematics_closest_with_tcp(const Matrix4x4 &desired_EEF_pose,
+std::vector<Matrix1x6> inverse_kinematics_closest_with_tcp(const Matrix4x4 &desired_EEF_pose,
                                                       const Matrix4x4 &tcp_transform,
                                                       double theta1,
                                                       double theta2,
@@ -357,27 +366,27 @@ vector<Matrix1x6> inverse_kinematics_closest_with_tcp(const Matrix4x4 &desired_E
 }  // namespace ur5e
 
 namespace ur10e {
-vector<Matrix1x6> inverse_kinematics(const Matrix4x4 &desired_EEF_pose) {
+std::vector<Matrix1x6> inverse_kinematics(const Matrix4x4 &desired_EEF_pose) {
   return ur_inverse_kinematics(desired_EEF_pose, d1, d4, d5, d6, a2, a3);
 }
 
-vector<Matrix1x6> inverse_kinematics_with_tcp(const Matrix4x4 &desired_EEF_pose, const Matrix4x4 &tcp_transform) {
+std::vector<Matrix1x6> inverse_kinematics_with_tcp(const Matrix4x4 &desired_EEF_pose, const Matrix4x4 &tcp_transform) {
   return inverse_kinematics(desired_EEF_pose * tcp_transform.inverse());
 }
 
-vector<Matrix1x6> inverse_kinematics_closest(const Matrix4x4 &desired_EEF_pose,
+std::vector<Matrix1x6> inverse_kinematics_closest(const Matrix4x4 &desired_EEF_pose,
                                              double theta1,
                                              double theta2,
                                              double theta3,
                                              double theta4,
                                              double theta5,
                                              double theta6) {
-  vector<Matrix1x6> solutions = inverse_kinematics(desired_EEF_pose);
+  std::vector<Matrix1x6> solutions = inverse_kinematics(desired_EEF_pose);
   Matrix1x6 joint_angles = {theta1, theta2, theta3, theta4, theta5, theta6};
   return closest_solution(solutions, joint_angles);
 }
 
-vector<Matrix1x6> inverse_kinematics_closest_with_tcp(const Matrix4x4 &desired_EEF_pose,
+std::vector<Matrix1x6> inverse_kinematics_closest_with_tcp(const Matrix4x4 &desired_EEF_pose,
                                                       const Matrix4x4 &tcp_transform,
                                                       double theta1,
                                                       double theta2,

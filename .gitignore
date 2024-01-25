@@ -7,3 +7,23 @@ build
 *.egg-info
 .vscode
 .vs
+
+# ignore files associated with CLion IDE
+.idea
+CMakeFiles
+cmake-build-debug
+.cmake
+CMakeCache.txt
+notebooks/.ipynb_checkpoints/
+
+_deps/
+
+Testing/Temporary/
+
+cmake_install.cmake
+
+.ninja_deps
+
+.ninja_log
+
+build.ninja

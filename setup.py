@@ -21,5 +21,6 @@ setup(
     packages=['ur_analytic_ik'],
     cmake_install_dir="ur_analytic_ik",
     include_package_data=True,
-    python_requires=">=3.8"
+    python_requires=">=3.8",
+    install_requires=["numpy"],
 )
