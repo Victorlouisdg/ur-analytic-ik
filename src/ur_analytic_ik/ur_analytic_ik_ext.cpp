@@ -1,4 +1,3 @@
-#pragma once
 #include "forward_kinematics.hh"
 #include "inverse_kinematics.hh"
 #include <nanobind/nanobind.h>
