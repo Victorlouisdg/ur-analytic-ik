@@ -44,9 +44,9 @@ def test_consistency():
         if len(joint_solutions) <= 1:
             continue  # A single solution is always consistent with itself
 
-        eef_pose0 = ur5e.forward_kinematics(*joint_solutions[0].T)
+        eef_pose0 = ur5e.forward_kinematics(*joint_solutions[0].squeeze())
         for joints in joint_solutions[1:]:
-            eefpose = ur5e.forward_kinematics(*joints.T)
+            eefpose = ur5e.forward_kinematics(*joints.squeeze())
             assert np.allclose(eef_pose0, eefpose)
 
 
@@ -57,7 +57,7 @@ def test_correctness():
         joint_solutions = ur5e.inverse_kinematics(original_eef_pose)
 
         for joints in joint_solutions:
-            eef_pose = np.array(ur5e.forward_kinematics(*joints.T))
+            eef_pose = np.array(ur5e.forward_kinematics(*joints.squeeze()))
             assert np.allclose(eef_pose, original_eef_pose)
 
 
@@ -117,7 +117,7 @@ def test_axis_aliged_eef_pose():
     assert len(joint_solutions) == 8
 
     for joints in joint_solutions:
-        eef_pose = np.array(ur5e.forward_kinematics(*joints.T))
+        eef_pose = np.array(ur5e.forward_kinematics(*joints.squeeze()))
         assert np.allclose(easily_reachable_pose, eef_pose)
 
 
