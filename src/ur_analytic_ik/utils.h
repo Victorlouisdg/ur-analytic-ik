@@ -2,8 +2,8 @@
 #ifndef MAIN_UTILS_H
 #define MAIN_UTILS_H
 
-#include <eigen3/Eigen/Core>
-#include <eigen3/Eigen/LU>
+#include <Eigen/Core>
+#include <Eigen/LU>
 #include <iomanip>
 #include <iostream>
 
