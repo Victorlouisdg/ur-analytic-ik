@@ -56,18 +56,18 @@ void define_forward_kinematics_with_tcp(
                    });
 }
 
-void define_inverse_kinematics(nb::module_ &robot_module, std::function<vector<Matrix1x6>(Matrix4x4)> ik_function) {
+void define_inverse_kinematics(nb::module_ &robot_module, std::function<std::vector<Matrix1x6>(Matrix4x4)> ik_function) {
   robot_module.def("inverse_kinematics", [=](nb::ndarray<> tensor) {
     // Copy the received tensor to a row-major Eigen matrix
     Matrix4x4 rowMajorMatrix;
     memcpy(rowMajorMatrix.data(), tensor.data(), 16 * sizeof(double));
 
     // Call the IK function
-    vector<Matrix1x6> solutions = ik_function(rowMajorMatrix);
+    std::vector<Matrix1x6> solutions = ik_function(rowMajorMatrix);
 
     // Copy returned Matrices into tensors
     using np_array_1x6 = nb::ndarray<nb::numpy, double, nb::shape<1, 6>>;
-    vector<np_array_1x6> vector_numpy;
+    std::vector<np_array_1x6> vector_numpy;
     for (auto solution : solutions) {
       size_t shape[2] = {1, 6};
       double *double_array = new double[6];
@@ -83,7 +83,7 @@ void define_inverse_kinematics(nb::module_ &robot_module, std::function<vector<M
 
 void define_inverse_kinematics_closest(
     nb::module_ &robot_module,
-    std::function<vector<Matrix1x6>(Matrix4x4, double, double, double, double, double, double)> ik_closest_function) {
+    std::function<std::vector<Matrix1x6>(Matrix4x4, double, double, double, double, double, double)> ik_closest_function) {
   robot_module.def("inverse_kinematics_closest",
                    [=](nb::ndarray<> tensor,
                        double theta1,
@@ -97,12 +97,12 @@ void define_inverse_kinematics_closest(
                      memcpy(rowMajorMatrix.data(), tensor.data(), 16 * sizeof(double));
 
                      // Call the IK function
-                     vector<Matrix1x6> solutions = ik_closest_function(
+                     std::vector<Matrix1x6> solutions = ik_closest_function(
                          rowMajorMatrix, theta1, theta2, theta3, theta4, theta5, theta6);
 
                      // Copy returned Matrices into tensors
                      using np_array_1x6 = nb::ndarray<nb::numpy, double, nb::shape<1, 6>>;
-                     vector<np_array_1x6> vector_numpy;
+                     std::vector<np_array_1x6> vector_numpy;
                      for (auto solution : solutions) {
                        size_t shape[2] = {1, 6};
                        double *double_array = new double[6];
@@ -117,7 +117,7 @@ void define_inverse_kinematics_closest(
 }
 
 void define_inverse_kinematics_with_tcp(nb::module_ &robot_module,
-                                        std::function<vector<Matrix1x6>(Matrix4x4, Matrix4x4)> ik_with_tcp_function) {
+                                        std::function<std::vector<Matrix1x6>(Matrix4x4, Matrix4x4)> ik_with_tcp_function) {
   robot_module.def("inverse_kinematics_with_tcp", [=](nb::ndarray<> tensor, nb::ndarray<> tcp_transform) {
     // Copy the received tensor to a row-major Eigen matrix
     Matrix4x4 rowMajorMatrix;
@@ -128,11 +128,11 @@ void define_inverse_kinematics_with_tcp(nb::module_ &robot_module,
     memcpy(tcp_transform_eigen.data(), tcp_transform.data(), 16 * sizeof(double));
 
     // Call the IK function
-    vector<Matrix1x6> solutions = ik_with_tcp_function(rowMajorMatrix, tcp_transform_eigen);
+    std::vector<Matrix1x6> solutions = ik_with_tcp_function(rowMajorMatrix, tcp_transform_eigen);
 
     // Copy returned Matrices into tensors
     using np_array_1x6 = nb::ndarray<nb::numpy, double, nb::shape<1, 6>>;
-    vector<np_array_1x6> vector_numpy;
+    std::vector<np_array_1x6> vector_numpy;
     for (auto solution : solutions) {
       size_t shape[2] = {1, 6};
       double *double_array = new double[6];
@@ -148,7 +148,7 @@ void define_inverse_kinematics_with_tcp(nb::module_ &robot_module,
 
 void define_inverse_kinematics_closest_with_tcp(
     nb::module_ &robot_module,
-    std::function<vector<Matrix1x6>(Matrix4x4, Matrix4x4, double, double, double, double, double, double)>
+    std::function<std::vector<Matrix1x6>(Matrix4x4, Matrix4x4, double, double, double, double, double, double)>
         ik_closest_with_tcp_function) {
   robot_module.def("inverse_kinematics_closest_with_tcp",
                    [=](nb::ndarray<> tensor,
@@ -168,12 +168,12 @@ void define_inverse_kinematics_closest_with_tcp(
                      memcpy(tcp_transform_eigen.data(), tcp_transform.data(), 16 * sizeof(double));
 
                      // Call the IK function
-                     vector<Matrix1x6> solutions = ik_closest_with_tcp_function(
+                     std::vector<Matrix1x6> solutions = ik_closest_with_tcp_function(
                          rowMajorMatrix, tcp_transform_eigen, theta1, theta2, theta3, theta4, theta5, theta6);
 
                      // Copy returned Matrices into tensors
                      using np_array_1x6 = nb::ndarray<nb::numpy, double, nb::shape<1, 6>>;
-                     vector<np_array_1x6> vector_numpy;
+                     std::vector<np_array_1x6> vector_numpy;
                      for (auto solution : solutions) {
                        size_t shape[2] = {1, 6};
                        double *double_array = new double[6];

@@ -17,7 +17,7 @@ int main()
       { 0.    ,  1.    ,  0.    ,  0.06655},
       { 0.    ,  0.    ,  0.    ,  1.    }
   };
-  vector<Matrix1x6> q_solutions;
+  std::vector<Matrix1x6> q_solutions;
   q_solutions = ur3e::inverse_kinematics(X_at_zero_truncated);
   std::cout << "there are " << q_solutions.size() << " IK solutions" << std::endl;
   std::cout <<  vector_with_matrices_to_string(q_solutions) << std::endl;
