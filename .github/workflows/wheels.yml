@@ -29,8 +29,6 @@ env:
   CIBW_PRERELEASE_PYTHONS: True
   # GitHub Actions doesn't have macOS/arm64 runners, skip test on this platform
   CIBW_TEST_SKIP: "*-macosx_arm64"
-  # make sure numpy is installed for the tests
-  CIBW_BEFORE_BUILD: pip install numpy
   # Run pytest to ensure that the package was correctly built
   CIBW_TEST_COMMAND: pytest {project}/tests
   CIBW_TEST_REQUIRES: pytest
