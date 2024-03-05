@@ -73,6 +73,10 @@ sudo ln -sf /usr/include/eigen3/Eigen /usr/include/Eigen
 sudo ln -sf /usr/include/eigen3/unsupported /usr/include/unsupported
 ```
 
+**Releasing:**
+Similar to how I release my pure Python projects e.g. [`airo-models`](https://github.com/airo-ugent/airo-models).
+One additional step is needed: manually create a release on Github.
+
 Welcome Improvements
 --------------------
 
