@@ -60,6 +60,19 @@ def test_correctness():
             eef_pose = np.array(ur5e.forward_kinematics(*joints.squeeze()))
             assert np.allclose(eef_pose, original_eef_pose)
 
+def test_correctness_edges_cases():
+    edge_case_joints = [
+        np.deg2rad([0, -45, -90, -90, 90, 0])
+    ]
+
+    for joints in edge_case_joints:
+        original_eef_pose = np.array(ur5e.forward_kinematics(*joints))
+        joint_solutions = ur5e.inverse_kinematics(original_eef_pose)
+
+        for joints in joint_solutions:
+            eef_pose = np.array(ur5e.forward_kinematics(*joints.squeeze()))
+            assert np.allclose(eef_pose, original_eef_pose)
+
 
 def test_inclusion():
     for _ in range(10000):
@@ -178,3 +191,4 @@ def test_with_tcp():
     # Check whether all joints are close to zero or two pi.
     two_pi = 2.0 * np.pi * np.ones(6)
     assert np.any([np.logical_or(np.isclose(zeros, joints), np.isclose(two_pi, joints)) for joints in joint_solutions])
+
