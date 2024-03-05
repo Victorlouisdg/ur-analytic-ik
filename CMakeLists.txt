@@ -1,16 +1,9 @@
-project(main)
-cmake_minimum_required(VERSION 3.18...3.22)
-add_compile_options(-std=c++17)
+cmake_minimum_required(VERSION 3.15...3.26)
 
-# If you want to develop, run cmake . -DDEVELOPMENT_MODE=true
-option(DEVELOPMENT_MODE "Set development mode in order to run cmake locally instead of using scikit-build" OFF)
+project(nanobind_example LANGUAGES CXX)
 
-if (DEVELOPMENT_MODE)
-    add_subdirectory(src)
-else () # pip install is called, this should be the default
-
-    if (NOT SKBUILD)
-        message(WARNING "\
+if (NOT SKBUILD)
+  message(WARNING "\
   This CMake file is meant to be executed using 'scikit-build'. Running
   it directly will almost certainly not produce the desired result. If
   you are a user trying to install this package, please use the command
@@ -30,81 +23,44 @@ else () # pip install is called, this should be the default
   You may optionally add -Ceditable.rebuild=true to auto-rebuild when
   the package is imported. Otherwise, you need to re-run the above
   after editing C++ files.")
-    endif ()
+endif()
 
-    # The following boilerplate code configures CMake so that it finds the right
-    # Python version (in particular, when it is run as part of 'scikit-build' using
-    # the GitHub Actions continuous integration server)
-    if (SKBUILD)
-        # Fix missing shared library name for cibuildwheel+windows+pypy3.9
-        if (MSVC AND NOT PYTHON_LIBRARY AND (${PYTHON_VERSION_STRING} MATCHES "3.9."))
-            get_filename_component(PYTHON_LIBRARY ${PYTHON_INCLUDE_DIR} DIRECTORY)
-            set(PYTHON_LIBRARY "${PYTHON_LIBRARY}/libs/python39.lib")
-        endif ()
+# Try to import all Python components potentially needed by nanobind
+find_package(Python 3.8
+  REQUIRED COMPONENTS Interpreter Development.Module
+  OPTIONAL_COMPONENTS Development.SABIModule)
 
-        set(Python_VERSION "${PYTHON_VERSION_STRING}")
-        set(Python_EXECUTABLE "${PYTHON_EXECUTABLE}")
-        set(Python_INCLUDE_DIR "${PYTHON_INCLUDE_DIR}")
-        set(Python_LIBRARY "${PYTHON_LIBRARY}")
+# Import nanobind through CMake's find_package mechanism
+find_package(nanobind CONFIG REQUIRED)
 
-        message(STATUS "Information from scikit-build:")
-        message(STATUS "  - Python_VERSION_STRING = ${Python_VERSION_STRING}")
-        message(STATUS "  - Python_EXECUTABLE = ${Python_EXECUTABLE}")
-        message(STATUS "  - Python_INCLUDE_DIR = ${Python_INCLUDE_DIR}")
-        message(STATUS "  - Python_LIBRARY = ${Python_LIBRARY}")
-    elseif (MSVC)
-        # MSVC needs a little extra help finding the Python library
-        find_package(PythonInterp)
-        find_package(Python)
-    endif ()
+# We are now ready to compile the actual extension module
+nanobind_add_module(
+  # Name of the extension
+  ur_analytic_ik_ext
 
-    # Create CMake targets for all Python components needed by nanobind
-    # Try to import all Python components potentially needed by nanobind
-    find_package(Python 3.8
-            REQUIRED COMPONENTS Interpreter Development.Module
-            OPTIONAL_COMPONENTS Development.SABIModule)
+  # Target the stable ABI for Python 3.12+, which reduces
+  # the number of binary wheels that must be built. This
+  # does nothing on older Python versions
+  STABLE_ABI
 
-    # Run `nanobind.cmake_dir()` from Python to detect where nanobind is installed
-    execute_process(
-            COMMAND
-            "${PYTHON_EXECUTABLE}" -c "import nanobind; print(nanobind.cmake_dir())"
-            OUTPUT_VARIABLE _tmp_dir
-            OUTPUT_STRIP_TRAILING_WHITESPACE COMMAND_ECHO STDOUT)
-    list(APPEND CMAKE_PREFIX_PATH "${_tmp_dir}")
+  # Build libnanobind statically and merge it into the
+  # extension (which itself remains a shared library)
+  #
+  # If your project builds multiple extensions, you can
+  # replace this flag by NB_SHARED to conserve space by
+  # reusing a shared libnanobind across libraries
+  NB_STATIC
 
-    # Now, import nanobind through CMake's find_package mechanism
-    find_package(nanobind CONFIG REQUIRED)
+  # Source code goes here
+  src/ur_analytic_ik/ur_analytic_ik_ext.cpp
+)
 
-    # We are now ready to compile the actual extension module
-    nanobind_add_module(
-            # Name of the extension
-            ur_analytic_ik_ext
+list(PREPEND CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/cmake)
+include(eigen)
 
-            # Target the stable ABI for Python 3.12+, which reduces
-            # the number of binary wheels that must be built. This
-            # does nothing on older Python versions
-            STABLE_ABI
+target_link_libraries(ur_analytic_ik_ext PUBLIC
+        Eigen3::Eigen
+)
 
-            # Build libnanobind statically and merge it into the
-            # extension (which itself remains a shared library)
-            #
-            # If your project builds multiple extensions, you could
-            # consider removing this flag to conserve space by
-            # reusing a shared libnanobind across libraries
-            NB_STATIC
-
-            # Source code goes here
-            src/ur_analytic_ik/ur_analytic_ik_ext.cpp
-    )
-
-    list(PREPEND CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/cmake)
-    include(eigen)
-
-    target_link_libraries(ur_analytic_ik_ext PUBLIC
-            Eigen3::Eigen
-    )
-
-    # Install directive for scikit-build
-    install(TARGETS ur_analytic_ik_ext LIBRARY DESTINATION .)
-
-endif ()
+# Install directive for scikit-build-core
+install(TARGETS ur_analytic_ik_ext LIBRARY DESTINATION .)
