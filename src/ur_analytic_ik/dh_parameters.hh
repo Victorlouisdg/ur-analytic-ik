@@ -9,12 +9,12 @@ const double alpha5 = -M_PI_2;
 #pragma once
 
 namespace ur3e {
-const double d1 = 0.1519;
-const double d4 = 0.11235;
+const double d1 = 0.15185;
+const double d4 = 0.13105;
 const double d5 = 0.08535;
-const double d6 = 0.0819;
-const double a2 = -0.24365;
-const double a3 = -0.21325;
+const double d6 = 0.0921;
+const double a2 = -0.24355;
+const double a3 = -0.2132;
 }  // namespace ur3e
 
 namespace ur5e {
@@ -23,7 +23,7 @@ const double d4 = 0.1333;
 const double d5 = 0.0997;
 const double d6 = 0.0996;
 const double a2 = -0.425;
-const double a3 = -0.39225;
+const double a3 = -0.3922;
 }  // namespace ur5e
 
 namespace ur10e {
