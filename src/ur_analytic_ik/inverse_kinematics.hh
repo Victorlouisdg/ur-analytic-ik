@@ -7,6 +7,7 @@
 #include <Eigen/LU>
 #include <iostream>
 #include <math.h>
+#include <vector>
 
 using namespace std;
 
@@ -383,7 +384,8 @@ std::vector<Matrix1x6> inverse_kinematics_closest(const Matrix4x4 &desired_EEF_p
                                                   double theta5,
                                                   double theta6) {
   std::vector<Matrix1x6> solutions = inverse_kinematics(desired_EEF_pose);
-  Matrix1x6 joint_angles = {theta1, theta2, theta3, theta4, theta5, theta6};
+  Matrix1x6 joint_angles;
+  joint_angles << theta1, theta2, theta3, theta4, theta5, theta6;
   return closest_solution(solutions, joint_angles);
 }
 
@@ -417,7 +419,8 @@ std::vector<Matrix1x6> inverse_kinematics_closest(const Matrix4x4 &desired_EEF_p
                                                   double theta5,
                                                   double theta6) {
   std::vector<Matrix1x6> solutions = inverse_kinematics(desired_EEF_pose);
-  Matrix1x6 joint_angles = {theta1, theta2, theta3, theta4, theta5, theta6};
+  Matrix1x6 joint_angles;
+  joint_angles << theta1, theta2, theta3, theta4, theta5, theta6;
   return closest_solution(solutions, joint_angles);
 }
 
@@ -452,7 +455,9 @@ std::vector<Matrix1x6> inverse_kinematics_closest(const Matrix4x4 &desired_EEF_p
                                                   double theta5,
                                                   double theta6) {
   std::vector<Matrix1x6> solutions = inverse_kinematics(desired_EEF_pose);
-  Matrix1x6 joint_angles = {theta1, theta2, theta3, theta4, theta5, theta6};
+
+  Matrix1x6 joint_angles;
+  joint_angles << theta1, theta2, theta3, theta4, theta5, theta6;
   return closest_solution(solutions, joint_angles);
 }
 

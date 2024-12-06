@@ -6,6 +6,7 @@
 #include <Eigen/LU>
 #include <iomanip>
 #include <iostream>
+#include <vector>
 
 //static std::string matrixXd_to_string(const Eigen::MatrixXd &matrix) {
 //  std::string matrixString = "[";
