@@ -9,11 +9,13 @@ Installation
 
 > Don't forget to activate your venv or conda environment.
 
-Clone this repository, then
+pre-built wheels are availabe on PyPI and can be installed with pip:
+
 ```bash
-cd ur-analytic-ik
-pip install .
+pip install ur_analytic_ik
 ```
+
+
 
 
 Usage
@@ -58,29 +60,55 @@ joint_solutions = ur3e.inverse_kinematics_with_tcp(eef_pose, tcp_transform)
 ```
 
 
-Testing
--------
-In the root directory of this repo, to run the tests:
-```
-pytest -v
-```
+
 
 Development
 --------------------
+
+This codebase uses [nanobind]() to provide python bindings for the FK/IK functions.
+
+## building
+**python package building** 
+
+This is the easiest option. It leverages scikit-build to create a python package and build the bindings. This flow is based on https://github.com/wjakob/nanobind_example
+
+- Create a conda environment for the project:  `conda env create -f environment.yaml` 
+- to create the python package, including the bindings: `pip install .` (this uses scikit-build to build the C++ from the top-level CMakelist.txt)
+- you can now import the library in python.
+
+
+**C++ building**
+
+if you want to build the C++ code without building the bindings or creating a python package:
+
+- make sure you have a C++ compiler available.
+- make sure you have the [Eigen]() package available, if not run `apt install libeigen3-dev`.
+
 Some linux users have eigen installed at /usr/include/eigen3 instead of /usr/include/Eigen. Symlink it:
 ```
 sudo ln -sf /usr/include/eigen3/Eigen /usr/include/Eigen
 sudo ln -sf /usr/include/eigen3/unsupported /usr/include/unsupported
 ```
+- run `cmake -S . -B` & `cmake --build build` from the `src/` dir. 
+- execute `./build/main`
 
-**Releasing:**
+
+## testing
+
+run `pytest -v .`
+
+Tests are also automatically executed in github for each commit.
+
+
+## Releasing
+
 Similar to how I release my pure Python projects e.g. [`airo-models`](https://github.com/airo-ugent/airo-models).
 One additional step is needed: manually create a release on Github.
 
 Welcome Improvements
 --------------------
 
-### Python API
+## Python API
 Adding an IK function that returns the closest solution and accepts a TCP transform.
 
 Reducing the amount of separate IK functions, e.g. replacing:

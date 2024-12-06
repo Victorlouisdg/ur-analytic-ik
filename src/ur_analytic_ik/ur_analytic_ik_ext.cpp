@@ -1,8 +1,9 @@
 #include "forward_kinematics.hh"
 #include "inverse_kinematics.hh"
+#include <nanobind/eigen/dense.h>
 #include <nanobind/nanobind.h>
-#include <nanobind/stl/vector.h>
 #include <nanobind/ndarray.h>
+#include <nanobind/stl/vector.h>
 
 namespace nb = nanobind;
 
@@ -16,14 +17,7 @@ void define_forward_kinematics(nb::module_ &robot_module,
                    [=](double theta1, double theta2, double theta3, double theta4, double theta5, double theta6) {
                      // Call the FK function
                      Matrix4x4 rowMajorMatrix = fk_function(theta1, theta2, theta3, theta4, theta5, theta6);
-
-                     // Copy returned Matrix to array of doubles
-                     size_t shape[2] = {4, 4};
-                     double *double_array = new double[16];
-                     memcpy(double_array, rowMajorMatrix.data(), 16 * sizeof(double));
-                     nb::capsule deleter(double_array, [](void *data) noexcept { delete[](double *) data; });
-
-                     return nb::ndarray<nb::numpy, double, nb::shape<4, 4>>(double_array, 2, shape, deleter);
+                     return rowMajorMatrix;
                    });
 }
 
@@ -37,111 +31,45 @@ void define_forward_kinematics_with_tcp(
                        double theta4,
                        double theta5,
                        double theta6,
-                       nb::ndarray<> tcp_transform) {
+                       Matrix4x4 tcp_transform) {
                      // Call the FK function
-                     Matrix4x4 tcp_transform_eigen;
-                     memcpy(tcp_transform_eigen.data(), tcp_transform.data(), 16 * sizeof(double));
-
                      Matrix4x4 rowMajorMatrix = fk_with_tcp_function(
-                         theta1, theta2, theta3, theta4, theta5, theta6, tcp_transform_eigen);
+                         theta1, theta2, theta3, theta4, theta5, theta6, tcp_transform);
 
-                     // Copy returned Matrix to array of doubles
-                     size_t shape[2] = {4, 4};
-                     double *double_array = new double[16];
-                     memcpy(double_array, rowMajorMatrix.data(), 16 * sizeof(double));
-                     nb::capsule deleter(double_array, [](void *data) noexcept { delete[](double *) data; });
-
-                     return nb::ndarray<nb::numpy, double, nb::shape<4, 4>>(double_array, 2, shape, deleter);
+                     return rowMajorMatrix;
                    });
 }
 
-void define_inverse_kinematics(nb::module_ &robot_module, std::function<std::vector<Matrix1x6>(Matrix4x4)> ik_function) {
-  robot_module.def("inverse_kinematics", [=](nb::ndarray<> tensor) {
-    // Copy the received tensor to a row-major Eigen matrix
-    Matrix4x4 rowMajorMatrix;
-    memcpy(rowMajorMatrix.data(), tensor.data(), 16 * sizeof(double));
-
+void define_inverse_kinematics(nb::module_ &robot_module,
+                               std::function<std::vector<Matrix1x6>(Matrix4x4)> ik_function) {
+  robot_module.def("inverse_kinematics", [=](Matrix4x4 tensor) {
     // Call the IK function
-    std::vector<Matrix1x6> solutions = ik_function(rowMajorMatrix);
-
-    // Copy returned Matrices into tensors
-    using np_array_1x6 = nb::ndarray<nb::numpy, double, nb::shape<1, 6>>;
-    std::vector<np_array_1x6> vector_numpy;
-    for (auto solution : solutions) {
-      size_t shape[2] = {1, 6};
-      double *double_array = new double[6];
-      memcpy(double_array, solution.data(), 6 * sizeof(double));
-      nb::capsule deleter(double_array, [](void *data) noexcept { delete[](double *) data; });
-      auto tensor = np_array_1x6(double_array, 2, shape, deleter);
-      vector_numpy.push_back(tensor);
-    }
-
-    return vector_numpy;
+    std::vector<Matrix1x6> solutions = ik_function(tensor);
+    return solutions;
   });
 }
 
 void define_inverse_kinematics_closest(
     nb::module_ &robot_module,
-    std::function<std::vector<Matrix1x6>(Matrix4x4, double, double, double, double, double, double)> ik_closest_function) {
-  robot_module.def("inverse_kinematics_closest",
-                   [=](nb::ndarray<> tensor,
-                       double theta1,
-                       double theta2,
-                       double theta3,
-                       double theta4,
-                       double theta5,
-                       double theta6) {
-                     // Copy the received tensor to a row-major Eigen matrix
-                     Matrix4x4 rowMajorMatrix;
-                     memcpy(rowMajorMatrix.data(), tensor.data(), 16 * sizeof(double));
+    std::function<std::vector<Matrix1x6>(Matrix4x4, double, double, double, double, double, double)>
+        ik_closest_function) {
+  robot_module.def(
+      "inverse_kinematics_closest",
+      [=](Matrix4x4 tensor, double theta1, double theta2, double theta3, double theta4, double theta5, double theta6) {
+        // Call the IK function
+        std::vector<Matrix1x6> solutions = ik_closest_function(tensor, theta1, theta2, theta3, theta4, theta5, theta6);
 
-                     // Call the IK function
-                     std::vector<Matrix1x6> solutions = ik_closest_function(
-                         rowMajorMatrix, theta1, theta2, theta3, theta4, theta5, theta6);
-
-                     // Copy returned Matrices into tensors
-                     using np_array_1x6 = nb::ndarray<nb::numpy, double, nb::shape<1, 6>>;
-                     std::vector<np_array_1x6> vector_numpy;
-                     for (auto solution : solutions) {
-                       size_t shape[2] = {1, 6};
-                       double *double_array = new double[6];
-                       memcpy(double_array, solution.data(), 6 * sizeof(double));
-                       nb::capsule deleter(double_array, [](void *data) noexcept { delete[](double *) data; });
-                       auto tensor = np_array_1x6(double_array, 2, shape, deleter);
-                       vector_numpy.push_back(tensor);
-                     }
-
-                     return vector_numpy;
-                   });
+        return solutions;
+      });
 }
 
-void define_inverse_kinematics_with_tcp(nb::module_ &robot_module,
-                                        std::function<std::vector<Matrix1x6>(Matrix4x4, Matrix4x4)> ik_with_tcp_function) {
-  robot_module.def("inverse_kinematics_with_tcp", [=](nb::ndarray<> tensor, nb::ndarray<> tcp_transform) {
-    // Copy the received tensor to a row-major Eigen matrix
-    Matrix4x4 rowMajorMatrix;
-    memcpy(rowMajorMatrix.data(), tensor.data(), 16 * sizeof(double));
-
-    // Copy the received tcp_transform to a row-major Eigen matrix
-    Matrix4x4 tcp_transform_eigen;
-    memcpy(tcp_transform_eigen.data(), tcp_transform.data(), 16 * sizeof(double));
-
+void define_inverse_kinematics_with_tcp(
+    nb::module_ &robot_module, std::function<std::vector<Matrix1x6>(Matrix4x4, Matrix4x4)> ik_with_tcp_function) {
+  robot_module.def("inverse_kinematics_with_tcp", [=](Matrix4x4 tensor, Matrix4x4 tcp_transform) {
     // Call the IK function
-    std::vector<Matrix1x6> solutions = ik_with_tcp_function(rowMajorMatrix, tcp_transform_eigen);
+    std::vector<Matrix1x6> solutions = ik_with_tcp_function(tensor, tcp_transform);
 
-    // Copy returned Matrices into tensors
-    using np_array_1x6 = nb::ndarray<nb::numpy, double, nb::shape<1, 6>>;
-    std::vector<np_array_1x6> vector_numpy;
-    for (auto solution : solutions) {
-      size_t shape[2] = {1, 6};
-      double *double_array = new double[6];
-      memcpy(double_array, solution.data(), 6 * sizeof(double));
-      nb::capsule deleter(double_array, [](void *data) noexcept { delete[](double *) data; });
-      auto tensor = np_array_1x6(double_array, 2, shape, deleter);
-      vector_numpy.push_back(tensor);
-    }
-
-    return vector_numpy;
+    return solutions;
   });
 }
 
@@ -150,39 +78,18 @@ void define_inverse_kinematics_closest_with_tcp(
     std::function<std::vector<Matrix1x6>(Matrix4x4, Matrix4x4, double, double, double, double, double, double)>
         ik_closest_with_tcp_function) {
   robot_module.def("inverse_kinematics_closest_with_tcp",
-                   [=](nb::ndarray<> tensor,
-                       nb::ndarray<> tcp_transform,
+                   [=](Matrix4x4 tensor,
+                       Matrix4x4 tcp_transform,
                        double theta1,
                        double theta2,
                        double theta3,
                        double theta4,
                        double theta5,
                        double theta6) {
-                     // Copy the received tensor to a row-major Eigen matrix
-                     Matrix4x4 rowMajorMatrix;
-                     memcpy(rowMajorMatrix.data(), tensor.data(), 16 * sizeof(double));
-
-                     // Copy the received tcp_transform to a row-major Eigen matrix
-                     Matrix4x4 tcp_transform_eigen;
-                     memcpy(tcp_transform_eigen.data(), tcp_transform.data(), 16 * sizeof(double));
-
                      // Call the IK function
                      std::vector<Matrix1x6> solutions = ik_closest_with_tcp_function(
-                         rowMajorMatrix, tcp_transform_eigen, theta1, theta2, theta3, theta4, theta5, theta6);
-
-                     // Copy returned Matrices into tensors
-                     using np_array_1x6 = nb::ndarray<nb::numpy, double, nb::shape<1, 6>>;
-                     std::vector<np_array_1x6> vector_numpy;
-                     for (auto solution : solutions) {
-                       size_t shape[2] = {1, 6};
-                       double *double_array = new double[6];
-                       memcpy(double_array, solution.data(), 6 * sizeof(double));
-                       nb::capsule deleter(double_array, [](void *data) noexcept { delete[](double *) data; });
-                       auto tensor = np_array_1x6(double_array, 2, shape, deleter);
-                       vector_numpy.push_back(tensor);
-                     }
-
-                     return vector_numpy;
+                         tensor, tcp_transform, theta1, theta2, theta3, theta4, theta5, theta6);
+                     return solutions;
                    });
 }
 
