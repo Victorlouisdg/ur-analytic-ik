@@ -61,7 +61,6 @@ jobs:
   build_wheels:
     name: Wheels on ${{ matrix.os }}
     runs-on: ${{ matrix.os }}
-    if: (github.event_name == 'push' && startsWith(github.ref, 'refs/tags/')) || github.event_name == 'workflow_dispatch' || github.event_name == 'pull_request' || github.event_name == 'release'
     strategy:
       fail-fast: false
       matrix:
