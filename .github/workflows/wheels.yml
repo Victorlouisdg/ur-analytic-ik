@@ -14,7 +14,9 @@ env:
   # Python 3.12+ is handled using the stable ABI, no need to build later versions
   CIBW_PROJECT_REQUIRES_PYTHON: ">=3.8, <=3.12"
   # Only build for PyPy 3.9
-  CIBW_SKIP: "pp37* pp38*"
+  # CIBW_SKIP: "pp37* pp38*"
+  CIBW_BUILD: "cp310-manylinux_x86_64" # for testing, build single wheel. 
+
   # Target 64 bit architectures (x86_64, and arm64 on macOS)
   CIBW_ARCHS_WINDOWS: auto64
   CIBW_ARCHS_LINUX: auto64
@@ -50,7 +52,7 @@ jobs:
 
       - uses: actions/upload-artifact@v4
         with:
-          name: sdist-artifact-${{strategy.job-index}}
+          name: cibw-sdist
           path: dist/*.tar.gz
 
   build_wheels:
@@ -78,7 +80,7 @@ jobs:
           name: wheelhouse-${{strategy.job-index}}
           path: wheelhouse/*.whl
 
-  upload_all:
+  upload_to_pypi:
     name: Upload if release
     needs: [build_wheels, build_sdist]
     runs-on: ubuntu-latest
@@ -86,7 +88,7 @@ jobs:
     if: github.event_name == 'release' && github.event.action == 'published' || github.event_name == 'workflow_dispatch'
 
     permissions: # Added OIDC permissions
-      contents: read # Gemini suggested this, I'm not sure if this is necessary
+      contents: read 
       id-token: write # IMPORTANT: this permission is mandatory for trusted publishing
 
     steps:
@@ -94,25 +96,9 @@ jobs:
 
       - uses: actions/download-artifact@v4
         with:
-          pattern: '**.whl' # Download all wheels
-          name: wheelhouse
-          merge-multiple: true
-        
-      - uses: actions/download-artifact@v4
-        with:
-          pattern: '**.tar.gz' # Download all dist
-          name: dist
-          merge-multiple: true
+          pattern: cibw-*
+          path: dist
+          merge-multiple: true 
 
       - name: Publish package distributions to PyPI
         uses: pypa/gh-action-pypi-publish@release/v1
-
-        # use test pypi or real pypi depending on the release tag
-        with:
-          user: __token__
-          password: ${{ secrets.PYPI_API_TOKEN }}
-          repository_url:  # test pypi if manually triggered, else pypi
-            ${{ github.event_name == 'workflow_dispatch' && 'https://test.pypi.org/simple/' || 'https://upload.pypi.org/simple/' }}
-          test: false
-          skip_existing: true
-          distributions: dist/*.tar.gz wheelhouse/*.whl
