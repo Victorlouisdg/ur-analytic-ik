@@ -38,13 +38,6 @@ env:
   CIBW_TEST_REQUIRES: pytest
 
 jobs:
-  check_version_matches_tag:
-    name: Check version matches tag
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-        with:
-          submodules: true
 
   build_sdist:
     name: Build SDist
@@ -68,7 +61,7 @@ jobs:
   build_wheels:
     name: Wheels on ${{ matrix.os }}
     runs-on: ${{ matrix.os }}
-    if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags/') || github.event_name == 'workflow_dispatch' || github.event_name == 'pull_request' || github.event_name == 'release'
+    if: (github.event_name == 'push' && startsWith(github.ref, 'refs/tags/')) || github.event_name == 'workflow_dispatch' || github.event_name == 'pull_request' || github.event_name == 'release'
     strategy:
       fail-fast: false
       matrix:
@@ -123,7 +116,7 @@ jobs:
     name: Upload to Test PyPI
     needs: [build_wheels, build_sdist]
 
-    if: github.event_name == 'release' || github.event_name == 'workflow_dispatch || github.event_name == 'push' && startsWith(github.ref, 'refs/tags/') || github.event_name == 'pull_request'
+    if: github.event_name == 'release' || github.event_name == 'workflow_dispatch || (github.event_name == 'push' && startsWith(github.ref, 'refs/tags/')) || github.event_name == 'pull_request'
     runs-on: ubuntu-latest
     permissions: # Added OIDC permissions
       contents: read 
