@@ -99,11 +99,17 @@ run `pytest -v .`
 
 Tests are also automatically executed in github for each commit.
 
+Wheels are built automatically for all PRs, you can check them on [test PyPI]().
+
 
 ## Releasing
 
-Similar to how I release my pure Python projects e.g. [`airo-models`](https://github.com/airo-ugent/airo-models).
-One additional step is needed: manually create a release on Github.
+- bump the version in the `pyproject.toml` file. We use [semantic versioning](). Use pre-releases if you want to test changes.
+- create a new tag, corresponding to the version: `git tag vX.Y.Z-...` 
+- push the tag `git push --tag`, this will already trigger a build of the wheels on [test PyPI](https://test.pypi.org/project/ur-analytic-ik/)
+- once you have verified the wheels work and are built properly, create a new release with the same name as the semantic version for the tag on github. This will trigger an upload to [PyPI](https://pypi.org/project/ur-analytic-ik/).
+
+
 
 Welcome Improvements
 --------------------
