@@ -127,11 +127,12 @@ jobs:
       - uses: actions/download-artifact@v4
         with:
           pattern: cibw-* # download all artifacts
+          path: dist
+          merge-multiple: true
       
       - name: Publish package distributions to Test PyPI
         uses: pypa/gh-action-pypi-publish@release/v1
         with:
-          server: https://test.pypi.org/legacy/
-          username: __token__
-          password: ${{ secrets.TEST_PYPI_PASSWORD }}
+          repository-ul: https://test.pypi.org/legacy/
+          user: tlpss
           skip-existing: false
