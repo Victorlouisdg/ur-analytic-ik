@@ -15,9 +15,10 @@ on:
 env:
   # Python 3.12+ is handled using the stable ABI, no need to build later versions
   CIBW_PROJECT_REQUIRES_PYTHON: ">=3.8, <=3.12"
-  # Only build for PyPy 3.9
-  # CIBW_SKIP: "pp37* pp38*"
-  CIBW_BUILD: "cp310-manylinux_x86_64" # for testing, build single wheel. 
+  # Only build for PyPy 3.9-
+  CIBW_SKIP: "pp37* pp38*"
+  # can be used for testing -> 
+  #CIBW_BUILD: "cp310-manylinux_x86_64" # for testing, build single wheel. 
 
   # Target 64 bit architectures (x86_64, and arm64 on macOS)
   CIBW_ARCHS_WINDOWS: auto64
@@ -29,8 +30,7 @@ env:
   CIBW_MANYLINUX_AARCH64_IMAGE: manylinux2014
   # Necessary to see build output from the actual compilation
   CIBW_BUILD_VERBOSITY: 1
-  # Temporary: use pre-release Python 3.12 for stable API builds
-  CIBW_PRERELEASE_PYTHONS: True
+
   # GitHub Actions doesn't have macOS/arm64 runners, skip test on this platform
   CIBW_TEST_SKIP: "*-macosx_arm64"
   # Run pytest to ensure that the package was correctly built
