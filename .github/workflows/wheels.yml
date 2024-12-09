@@ -82,7 +82,8 @@ jobs:
     name: Upload if release
     needs: [build_wheels, build_sdist]
     runs-on: ubuntu-latest
-    if: github.event_name == 'release' && github.event.action == 'published'
+    # run on published release or manual trigger
+    if: github.event_name == 'release' && github.event.action == 'published' || github.event_name == 'workflow_dispatch'
 
     permissions: # Added OIDC permissions
       contents: read # Gemini suggested this, I'm not sure if this is necessary
@@ -93,9 +94,25 @@ jobs:
 
       - uses: actions/download-artifact@v4
         with:
-          name: artifact
-          path: dist
+          pattern: '**.whl' # Download all wheels
+          name: wheelhouse
+          merge-multiple: true
+        
+      - uses: actions/download-artifact@v4
+        with:
+          pattern: '**.tar.gz' # Download all dist
+          name: dist
           merge-multiple: true
 
       - name: Publish package distributions to PyPI
         uses: pypa/gh-action-pypi-publish@release/v1
+
+        # use test pypi or real pypi depending on the release tag
+        with:
+          user: __token__
+          password: ${{ secrets.PYPI_API_TOKEN }}
+          repository_url:  # test pypi if manually triggered, else pypi
+            ${{ github.event_name == 'workflow_dispatch' && 'https://test.pypi.org/simple/' || 'https://upload.pypi.org/simple/' }}
+          test: false
+          skip_existing: true
+          distributions: dist/*.tar.gz wheelhouse/*.whl
