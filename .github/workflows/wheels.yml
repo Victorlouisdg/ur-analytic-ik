@@ -9,6 +9,7 @@ on:
   release:
     types:
       - published
+  tag: # Trigger on tag push
 
 env:
   # Python 3.12+ is handled using the stable ABI, no need to build later versions
@@ -36,6 +37,14 @@ env:
   CIBW_TEST_REQUIRES: pytest
 
 jobs:
+  check_version_matches_tag:
+    name: Check version matches tag
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: true
+
   build_sdist:
     name: Build SDist
     runs-on: ubuntu-latest
@@ -58,10 +67,12 @@ jobs:
   build_wheels:
     name: Wheels on ${{ matrix.os }}
     runs-on: ${{ matrix.os }}
+    if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags/') || github.event_name == 'workflow_dispatch' || github.event_name == 'pull_request' || github.event_name == 'release'
     strategy:
       fail-fast: false
       matrix:
         os: [ubuntu-latest]
+  
 
     steps:
       - uses: actions/checkout@v4
@@ -74,11 +85,12 @@ jobs:
         run: git diff --exit-code
         shell: bash
 
-      - name: Upload wheels
-        uses: actions/upload-artifact@v4
-        with:
-          name: wheelhouse-${{strategy.job-index}}
-          path: wheelhouse/*.whl
+        - name: upload wheels
+          uses: actions/upload-artifact@v4
+          with:
+            name: cibw-wheels-${{ matrix.os }}-${{ strategy.job-index }} # unique name for the artifact
+            path: wheelhouse/*.whl # location of the wheels
+
 
   upload_to_pypi:
     name: Upload if release
@@ -96,9 +108,35 @@ jobs:
 
       - uses: actions/download-artifact@v4
         with:
-          pattern: cibw-*
+          pattern: cibw-* # download all artifacts
           path: dist
           merge-multiple: true 
 
       - name: Publish package distributions to PyPI
         uses: pypa/gh-action-pypi-publish@release/v1
+
+
+  upload_to_test_pypi:
+    # runs for distributions or tags
+
+    name: Upload to Test PyPI
+    needs: [build_wheels, build_sdist]
+
+    if: github.event_name == 'release' || github.event_name == 'workflow_dispatch || github.event_name == 'push' && startsWith(github.ref, 'refs/tags/') || github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    permissions: # Added OIDC permissions
+      contents: read 
+      id-token: write # IMPORTANT: this permission is mandatory for trusted publishing
+
+    steps:
+      - uses: actions/setup-python@v4
+      - uses: actions/download-artifact@v4
+        with:
+          pattern: cibw-* # download all artifacts
+      
+      - name: Publish package distributions to Test PyPI
+        uses: pypa/gh-action-pypi-publish@release/v1
+        with:
+          server: https://test.pypi.org/legacy/
+          username: __token__
+          password: ${{ secrets.TEST_PYPI_PASSWORD }}
