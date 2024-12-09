@@ -133,6 +133,6 @@ jobs:
       - name: Publish package distributions to Test PyPI
         uses: pypa/gh-action-pypi-publish@release/v1
         with:
-          repository-ul: https://test.pypi.org/legacy/
+          repository-url: https://test.pypi.org/legacy/
           user: tlpss
           skip-existing: false
