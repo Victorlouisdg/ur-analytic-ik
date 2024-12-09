@@ -6,10 +6,11 @@ on:
   push:
     branches:
       - main
+    tag:
+      - '*'
   release:
     types:
       - published
-  tag: # Trigger on tag push
 
 env:
   # Python 3.12+ is handled using the stable ABI, no need to build later versions
