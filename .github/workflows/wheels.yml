@@ -86,11 +86,11 @@ jobs:
         run: git diff --exit-code
         shell: bash
 
-        - name: upload wheels
-          uses: actions/upload-artifact@v4
-          with:
-            name: cibw-wheels-${{ matrix.os }}-${{ strategy.job-index }} # unique name for the artifact
-            path: wheelhouse/*.whl # location of the wheels
+      - name: upload wheels
+        uses: actions/upload-artifact@v4
+        with:
+          name: cibw-wheels-${{ matrix.os }}-${{ strategy.job-index }} # unique name for the artifact
+          path: wheelhouse/*.whl # location of the wheels
 
 
   upload_to_pypi:
