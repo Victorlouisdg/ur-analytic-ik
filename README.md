@@ -4,10 +4,19 @@ C++ implementation with Python bindings of analytic forward and inverse kinemati
 
 > This project is still very experimental, the API will likely still change.
 
+
+The main advantages of using analytic IK:
+- extremely fast. FK calls from python take +- 4 µs, IK calls +- 18 µs. 
+- finds all solutions at once, allowing you to select the most convenient one.
+- no need to provide initial guess, as opposed to numerical IK solutions.
+
+
+> Warning: this repo uses the default DH-parameters for the UR robots. But every robot is slightly different and is factory-calibrated to provide very accurate DH parameters, which are also used by the robot controlbox. From a few tests we have run, using the default DH-parameters typically results in 1-2mm differences in the FK for a given joint configuration. See [here](notebooks/compare_to_real_robot.ipynb) for details. If you need very high precision, you might want to use your robot's DH-parameters for FK/IK. 
+
+
+
 Installation
 ------------
-
-> Don't forget to activate your venv or conda environment.
 
 pre-built wheels are availabe on PyPI and can be installed with pip:
 
@@ -15,8 +24,7 @@ pre-built wheels are availabe on PyPI and can be installed with pip:
 pip install ur_analytic_ik
 ```
 
-
-
+To install from source, see the Developer section.
 
 Usage
 -----
