@@ -37,6 +37,7 @@ void define_forward_kinematics(nb::module_ &robot_module, std::function<Matrix4x
   );
 }
 
+
 void define_inverse_kinematics(nb::module_ &robot_module,
                                std::function<std::vector<Matrix1x6>(Matrix4x4)> ik_function) {
   robot_module.def("inverse_kinematics", [=](Matrix4x4 tensor) {
