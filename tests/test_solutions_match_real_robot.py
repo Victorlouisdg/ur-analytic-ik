@@ -17,7 +17,7 @@ def read_poses(file):
         # strip the brackets
         joint_config[0] = joint_config[0][1:]
         joint_config[-1] = joint_config[-1][:-1]
-        joint_config = [float(j) for j in joint_config]
+        joint_config = np.array([float(j) for j in joint_config])
         
         pose = pose.split(",")
         # remove all brackets
@@ -39,6 +39,6 @@ def test_solutions_match_real_ur5e():
         assert np.isclose(joint_solution, joint_config,atol=1e-2).all()
 
 
-        fk_pose = ur5e.forward_kinematics(*joint_config)
+        fk_pose = ur5e.forward_kinematics(joint_config)
         assert np.linalg.norm(fk_pose[:3,3] - pose[:3,3]) < 3e-3 # 3mm tolerance
         

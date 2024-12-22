@@ -10,35 +10,28 @@ namespace nb = nanobind;
 using namespace nb::literals;
 using namespace std;
 
-// TODO document the how/why of these define functions
 void define_forward_kinematics(nb::module_ &robot_module,
-                               std::function<Matrix4x4(double, double, double, double, double, double)> fk_function) {
+                               std::function<Matrix4x4(Vector6d,Matrix4x4)> fk_function) {
   robot_module.def("forward_kinematics",
-                   [=](double theta1, double theta2, double theta3, double theta4, double theta5, double theta6) {
+                   [=](Vector6d joint_angles, Matrix4x4 tcp_in_flange_pose = Matrix4x4::Identity()) {
                      // Call the FK function
-                     Matrix4x4 rowMajorMatrix = fk_function(theta1, theta2, theta3, theta4, theta5, theta6);
+                     Matrix4x4 rowMajorMatrix = fk_function(joint_angles, tcp_in_flange_pose);
                      return rowMajorMatrix;
-                   });
+                   }, "joint_angles"_a, "tcp_pose"_a = Matrix4x4::Identity(),
+                   "Calculates the forward kinematics of the robot, providing the TCP pose in the robot's base frame for a given joint configuration"
+                   //TODO(tlpss): figure out how to use multi-line docstrings 
+
+                  //  "Calculates the forward kinematics of the robot, providing the TCP pose in the robot's base frame for a given joint configuration
+                  //  Also takes in the offset (pose) of the TCP w.r.t. the flange frame, as the FK function only knows the kinematics of the robot, not the tool.
+
+                  //   :param joint_angles: A 6-element vector containing the joint angles in radians.
+                  //   :param tcp_pose: A 4x4 matrix representing the pose of the TCP in the robot tool frame. Defaults to identity, in which case the TCP is assumed to be at the flange.
+
+                  //   :return: A 4x4 matrix representing the pose of the TCP in the robot base frame.
+                  //  "
+                   );
 }
 
-void define_forward_kinematics_with_tcp(
-    nb::module_ &robot_module,
-    std::function<Matrix4x4(double, double, double, double, double, double, Matrix4x4)> fk_with_tcp_function) {
-  robot_module.def("forward_kinematics_with_tcp",
-                   [=](double theta1,
-                       double theta2,
-                       double theta3,
-                       double theta4,
-                       double theta5,
-                       double theta6,
-                       Matrix4x4 tcp_transform) {
-                     // Call the FK function
-                     Matrix4x4 rowMajorMatrix = fk_with_tcp_function(
-                         theta1, theta2, theta3, theta4, theta5, theta6, tcp_transform);
-
-                     return rowMajorMatrix;
-                   });
-}
 
 void define_inverse_kinematics(nb::module_ &robot_module,
                                std::function<std::vector<Matrix1x6>(Matrix4x4)> ik_function) {
@@ -96,7 +89,6 @@ void define_inverse_kinematics_closest_with_tcp(
 NB_MODULE(ur_analytic_ik_ext, m) {
   nb::module_ m_ur3e = m.def_submodule("ur3e", "UR3e module");
   define_forward_kinematics(m_ur3e, ur3e::forward_kinematics);
-  define_forward_kinematics_with_tcp(m_ur3e, ur3e::forward_kinematics_with_tcp);
   define_inverse_kinematics(m_ur3e, ur3e::inverse_kinematics);
   define_inverse_kinematics_closest(m_ur3e, ur3e::inverse_kinematics_closest);
   define_inverse_kinematics_with_tcp(m_ur3e, ur3e::inverse_kinematics_with_tcp);
@@ -104,7 +96,6 @@ NB_MODULE(ur_analytic_ik_ext, m) {
 
   nb::module_ m_ur5e = m.def_submodule("ur5e", "UR5e module");
   define_forward_kinematics(m_ur5e, ur5e::forward_kinematics);
-  define_forward_kinematics_with_tcp(m_ur5e, ur5e::forward_kinematics_with_tcp);
   define_inverse_kinematics(m_ur5e, ur5e::inverse_kinematics);
   define_inverse_kinematics_closest(m_ur5e, ur5e::inverse_kinematics_closest);
   define_inverse_kinematics_with_tcp(m_ur5e, ur5e::inverse_kinematics_with_tcp);
@@ -112,7 +103,6 @@ NB_MODULE(ur_analytic_ik_ext, m) {
 
   nb::module_ m_ur10e = m.def_submodule("ur10e", "UR10e module");
   define_forward_kinematics(m_ur10e, ur10e::forward_kinematics);
-  define_forward_kinematics_with_tcp(m_ur10e, ur10e::forward_kinematics_with_tcp);
   define_inverse_kinematics(m_ur10e, ur10e::inverse_kinematics);
   define_inverse_kinematics_closest(m_ur10e, ur10e::inverse_kinematics_closest);
   define_inverse_kinematics_with_tcp(m_ur10e, ur10e::inverse_kinematics_with_tcp);
