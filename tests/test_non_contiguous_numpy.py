@@ -19,5 +19,5 @@ def test_non_contiguous(robot):
     assert len(joint_solutions) == 8, f"Expected 8 solutions, got {len(joint_solutions)}"
 
     for joints in joint_solutions:
-        eef_pose = np.array(robot.forward_kinematics(*joints.squeeze()))
+        eef_pose = np.array(robot.forward_kinematics(joints.squeeze()))
         assert np.allclose(eef_pose, pose), f"Expected {pose}, got {eef_pose} for one of the joint configurations"
