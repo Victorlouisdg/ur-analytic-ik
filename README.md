@@ -65,6 +65,7 @@ tcp_pose = ur3e.forward_kinematics_with_tcp(*joints, tcp_transform)
 joint_solutions = ur3e.inverse_kinematics(eef_pose)
 joint_solutions = ur3e.inverse_kinematics_closest(eef_pose, *joints)
 joint_solutions = ur3e.inverse_kinematics_with_tcp(eef_pose, tcp_transform)
+joint_solutions = ur3e.inverse_kinematics_closest_with_tcp(eef_pose, tcp_transform, *joints)
 ```
 
 

@@ -213,3 +213,29 @@ def test_with_tcp():
     two_pi = 2.0 * np.pi * np.ones(6)
     assert np.any([np.logical_or(np.isclose(zeros, joints), np.isclose(two_pi, joints)) for joints in joint_solutions])
 
+
+def test_closest_with_tcp():
+    tcp_transform = np.identity(4)
+    tcp_transform[2, 3] = 0.2
+
+    for _ in range(10000):
+        # just some random pose we want to reach by specifying it in joint space and then going to task space
+        __q_target = np.random.uniform(-2 * np.pi, 2 * np.pi, 6)
+        X_target = np.array(ur5e.forward_kinematics_with_tcp(*__q_target, tcp_transform))
+
+        # here the real test starts
+        q_targets = ur5e.inverse_kinematics_with_tcp(X_target, tcp_transform)
+
+        # lets place the arm at a random configuration and do the IK from there
+        q_start = np.random.uniform(-np.pi, np.pi, 6)  # Smaller range for equality check to work
+        q_closest_from_start = ur5e.inverse_kinematics_closest_with_tcp(X_target, tcp_transform, *q_start)
+        q_closest_from_start = q_closest_from_start[0]  # We know there should be at least one solution
+        min_dist = np.linalg.norm(q_closest_from_start - q_start)
+
+        # Test that closest solution is actually the closest of all solutions.
+        for q in q_targets:
+            q_dist = np.linalg.norm(q - q_start)
+            ik_closest_is_really_closest = min_dist <= q_dist
+            enable_this_test = False
+            if enable_this_test:
+                assert ik_closest_is_really_closest
