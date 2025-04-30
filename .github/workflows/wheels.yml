@@ -16,7 +16,7 @@ env:
   # Python 3.12+ is handled using the stable ABI, no need to build later versions
   CIBW_PROJECT_REQUIRES_PYTHON: ">=3.8, <=3.12"
   # Only build for PyPy 3.9- and skip muslinux bc their test are slow (buids np from source)
-  CIBW_SKIP: "pp37* pp38* *muslinux*"
+  CIBW_SKIP: "pp37* pp38* *musllinux*"
   # can be used for testing -> 
   #CIBW_BUILD: "cp310-manylinux_x86_64" # for testing, build single wheel. 
 
