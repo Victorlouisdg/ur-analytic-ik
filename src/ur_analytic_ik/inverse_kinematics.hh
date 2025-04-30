@@ -343,7 +343,7 @@ std::vector<Matrix1x6> closest_solution(std::vector<Matrix1x6> &solutions, const
 
   // Alternative solution is either +2pi or -2pi depending on the sign of the closest solution.
   Matrix1x6 alternative_solution = closest_solution.unaryExpr([](const double x) {
-    if (x > 0) {
+    if (x < 0) {
       return x + 2.0 * M_PI;
     } else {
       return x - 2.0 * M_PI;

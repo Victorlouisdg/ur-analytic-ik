@@ -157,6 +157,27 @@ def test_closest():
             if enable_this_test:
                 assert ik_closest_is_really_closest
 
+def test_closest_solution_with_range_2pi():
+    """
+    Test that the closest solutions work in the full range of -2pi to 2pi
+    """
+    import pathlib
+    np.random.seed(0)
+    for _ in range(100):
+        joint_config = np.random.uniform(-np.pi, np.pi, 6)
+        pose = ur5e.forward_kinematics(*joint_config)
+
+        extended_joint_config = np.array(joint_config)
+        # add 2pi to a random joint if < 0 else -2pi
+        random_joint = np.random.randint(0, 6)
+        if extended_joint_config[random_joint] < 0:
+            extended_joint_config[random_joint] += 2 * np.pi
+        else:
+            extended_joint_config[random_joint] -= 2 * np.pi
+
+        # check that the closest solution is the same as the joint config
+        closest_solution = ur5e.inverse_kinematics_closest(pose, *extended_joint_config)[0]
+        assert np.isclose(closest_solution, extended_joint_config, atol=1e-2).all()
 
 def test_rounded_pose():
     """
