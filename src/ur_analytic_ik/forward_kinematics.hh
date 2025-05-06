@@ -3,6 +3,7 @@
 #include <Eigen/Dense>
 
 using Matrix4x4 = Eigen::Matrix<double, 4, 4, Eigen::RowMajor>;
+using Vector6d = Eigen::Matrix<double, 6, 1>;
 
 Matrix4x4 dh_matrix(double theta_i, double d_i, double a_i, double alpha_i) {
   // TODO: figure out how to make this more legible
@@ -36,55 +37,60 @@ Matrix4x4 ur_forward_kinematics(double theta1,
 }
 
 namespace ur3e {
-Matrix4x4 forward_kinematics(
-    double theta1, double theta2, double theta3, double theta4, double theta5, double theta6) {
-  return ur_forward_kinematics(theta1, theta2, theta3, theta4, theta5, theta6, d1, d4, d5, d6, a2, a3);
-}
-
-Matrix4x4 forward_kinematics_with_tcp(double theta1,
-                                      double theta2,
-                                      double theta3,
-                                      double theta4,
-                                      double theta5,
-                                      double theta6,
-                                      const Matrix4x4 &tcp_transform) {
-  return forward_kinematics(theta1, theta2, theta3, theta4, theta5, theta6) * tcp_transform;
+Matrix4x4 forward_kinematics(const Vector6d &joint_angles, Matrix4x4 tcp_pose = Matrix4x4::Identity()) {
+  assert(joint_angles.size() == 6 && "Joint angles vector must contain exactly 6 elements");
+  return ur_forward_kinematics(joint_angles[0],
+                               joint_angles[1],
+                               joint_angles[2],
+                               joint_angles[3],
+                               joint_angles[4],
+                               joint_angles[5],
+                               d1,
+                               d4,
+                               d5,
+                               d6,
+                               a2,
+                               a3) *
+         tcp_pose;
 }
 
 }  // namespace ur3e
 
 namespace ur5e {
-Matrix4x4 forward_kinematics(
-    double theta1, double theta2, double theta3, double theta4, double theta5, double theta6) {
-  return ur_forward_kinematics(theta1, theta2, theta3, theta4, theta5, theta6, d1, d4, d5, d6, a2, a3);
+Matrix4x4 forward_kinematics(const Vector6d &joint_angles, Matrix4x4 tcp_pose = Matrix4x4::Identity()) {
+  assert(joint_angles.size() == 6 && "Joint angles vector must contain exactly 6 elements");
+  return ur_forward_kinematics(joint_angles[0],
+                               joint_angles[1],
+                               joint_angles[2],
+                               joint_angles[3],
+                               joint_angles[4],
+                               joint_angles[5],
+                               d1,
+                               d4,
+                               d5,
+                               d6,
+                               a2,
+                               a3) *
+         tcp_pose;
 }
-
-Matrix4x4 forward_kinematics_with_tcp(double theta1,
-                                      double theta2,
-                                      double theta3,
-                                      double theta4,
-                                      double theta5,
-                                      double theta6,
-                                      const Matrix4x4 &tcp_transform) {
-  return forward_kinematics(theta1, theta2, theta3, theta4, theta5, theta6) * tcp_transform;
-}
-
 }  // namespace ur5e
 
 namespace ur10e {
-Matrix4x4 forward_kinematics(
-    double theta1, double theta2, double theta3, double theta4, double theta5, double theta6) {
-  return ur_forward_kinematics(theta1, theta2, theta3, theta4, theta5, theta6, d1, d4, d5, d6, a2, a3);
-}
-
-Matrix4x4 forward_kinematics_with_tcp(double theta1,
-                                      double theta2,
-                                      double theta3,
-                                      double theta4,
-                                      double theta5,
-                                      double theta6,
-                                      const Matrix4x4 &tcp_transform) {
-  return forward_kinematics(theta1, theta2, theta3, theta4, theta5, theta6) * tcp_transform;
+Matrix4x4 forward_kinematics(const Vector6d &joint_angles, Matrix4x4 tcp_pose = Matrix4x4::Identity()) {
+  assert(joint_angles.size() == 6 && "Joint angles vector must contain exactly 6 elements");
+  return ur_forward_kinematics(joint_angles[0],
+                               joint_angles[1],
+                               joint_angles[2],
+                               joint_angles[3],
+                               joint_angles[4],
+                               joint_angles[5],
+                               d1,
+                               d4,
+                               d5,
+                               d6,
+                               a2,
+                               a3) *
+         tcp_pose;
 }
 
 }  // namespace ur10e

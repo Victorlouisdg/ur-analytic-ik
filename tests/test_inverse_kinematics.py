@@ -38,26 +38,26 @@ def seed():
 def test_consistency():
     for _ in range(10000):
         random_joints = np.random.uniform(-2 * np.pi, 2 * np.pi, 6)
-        eef_pose = ur5e.forward_kinematics(*random_joints)
+        eef_pose = ur5e.forward_kinematics(random_joints)
         joint_solutions = ur5e.inverse_kinematics(np.array(eef_pose))
 
         if len(joint_solutions) <= 1:
             continue  # A single solution is always consistent with itself
 
-        eef_pose0 = ur5e.forward_kinematics(*joint_solutions[0].squeeze())
+        eef_pose0 = ur5e.forward_kinematics(joint_solutions[0].squeeze())
         for joints in joint_solutions[1:]:
-            eefpose = ur5e.forward_kinematics(*joints.squeeze())
+            eefpose = ur5e.forward_kinematics(joints.squeeze())
             assert np.allclose(eef_pose0, eefpose)
 
 
 def test_correctness():
     for _ in range(10000):
         random_joints = np.random.uniform(-2 * np.pi, 2 * np.pi, 6)
-        original_eef_pose = np.array(ur5e.forward_kinematics(*random_joints))
+        original_eef_pose = np.array(ur5e.forward_kinematics(random_joints))
         joint_solutions = ur5e.inverse_kinematics(original_eef_pose)
 
         for joints in joint_solutions:
-            eef_pose = np.array(ur5e.forward_kinematics(*joints.squeeze()))
+            eef_pose = np.array(ur5e.forward_kinematics(joints.squeeze()))
             assert np.allclose(eef_pose, original_eef_pose)
 
 def test_correctness_edges_cases():
@@ -66,18 +66,18 @@ def test_correctness_edges_cases():
     ]
 
     for joints in edge_case_joints:
-        original_eef_pose = np.array(ur5e.forward_kinematics(*joints))
+        original_eef_pose = np.array(ur5e.forward_kinematics(joints))
         joint_solutions = ur5e.inverse_kinematics(original_eef_pose)
 
         for joints in joint_solutions:
-            eef_pose = np.array(ur5e.forward_kinematics(*joints.squeeze()))
+            eef_pose = np.array(ur5e.forward_kinematics(joints.squeeze()))
             assert np.allclose(eef_pose, original_eef_pose)
 
 
 def test_inclusion():
     for _ in range(10000):
         random_joints = np.random.uniform(-np.pi, np.pi, 6)  # Smaller range for equality check to work
-        eef_pose = ur5e.forward_kinematics(*random_joints)
+        eef_pose = ur5e.forward_kinematics(random_joints)
         joint_solutions = ur5e.inverse_kinematics(np.array(eef_pose))
 
         # random_joints should be one of the solutions
@@ -103,7 +103,7 @@ def test_strictness():
 def test_range():
     for _ in range(10000):
         random_joints = np.random.uniform(2 * np.pi, 2 * np.pi, 6)
-        eef_pose = ur5e.forward_kinematics(*random_joints)
+        eef_pose = ur5e.forward_kinematics(random_joints)
         joint_solutions = ur5e.inverse_kinematics(np.array(eef_pose))
 
         for joints in joint_solutions:
@@ -130,7 +130,7 @@ def test_axis_aliged_eef_pose():
     assert len(joint_solutions) == 8
 
     for joints in joint_solutions:
-        eef_pose = np.array(ur5e.forward_kinematics(*joints.squeeze()))
+        eef_pose = np.array(ur5e.forward_kinematics(joints.squeeze()))
         assert np.allclose(easily_reachable_pose, eef_pose)
 
 
@@ -138,7 +138,7 @@ def test_closest():
     for _ in range(10000):
         # just some random pose we want to reach by specifying it in joint space and then going to task space
         __q_target = np.random.uniform(-2 * np.pi, 2 * np.pi, 6)
-        X_target = np.array(ur5e.forward_kinematics(*__q_target))
+        X_target = np.array(ur5e.forward_kinematics(__q_target))
 
         # here the real test starts
         q_targets = ur5e.inverse_kinematics(X_target)
@@ -206,7 +206,7 @@ def test_with_tcp():
 
     zeros = np.zeros(6)
 
-    tcp_pose = ur5e.forward_kinematics_with_tcp(*zeros, tcp_transform)
+    tcp_pose = ur5e.forward_kinematics(zeros, tcp_transform)
     joint_solutions = ur5e.inverse_kinematics_with_tcp(np.array(tcp_pose), tcp_transform)
 
     # Check whether all joints are close to zero or two pi.

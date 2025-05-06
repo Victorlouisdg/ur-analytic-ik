@@ -58,9 +58,8 @@ eef_pose[2, 3] = 0.4
 tcp_transform = np.identity(4)
 tcp_transform[2, 3] = 0.1
 
-ur3e.forward_kinematics(0, 0, 0, 0, 0, 0)
-ur3e.forward_kinematics(*joints)
-tcp_pose = ur3e.forward_kinematics_with_tcp(*joints, tcp_transform)
+ur3e.forward_kinematics(joints)
+tcp_pose = ur3e.forward_kinematics(joints, tcp_transform)
 
 joint_solutions = ur3e.inverse_kinematics(eef_pose)
 joint_solutions = ur3e.inverse_kinematics_closest(eef_pose, *joints)
@@ -74,7 +73,7 @@ joint_solutions = ur3e.inverse_kinematics_closest_with_tcp(eef_pose, tcp_transfo
 Development
 --------------------
 
-This codebase uses [nanobind]() to provide python bindings for the FK/IK functions.
+This codebase uses [nanobind](https://nanobind.readthedocs.io/en/latest/index.html) to provide python bindings for the FK/IK functions.
 
 ## building
 **python package building** 
