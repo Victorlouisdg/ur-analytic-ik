@@ -35,264 +35,42 @@ Matrix4x4 ur_forward_kinematics(double theta1,
   return T01 * T12 * T23 * T34 * T45 * T56;
 }
 
-// ================================== UR3 ==================================
-namespace ur3 {
-Matrix4x4 forward_kinematics(
-    double theta1, double theta2, double theta3, double theta4, double theta5, double theta6) {
-  return ur_forward_kinematics(theta1, theta2, theta3, theta4, theta5, theta6, d1, d4, d5, d6, a2, a3);
+template <typename T>
+struct UR_FK_Logic
+{
+  static Matrix4x4 forward_kinematics(
+      double t1, double t2, double t3, double t4, double t5, double t6)
+  {
+    return ur_forward_kinematics(t1, t2, t3, t4, t5, t6, T::d1, T::d4, T::d5, T::d6, T::a2, T::a3);
+  }
+
+  static Matrix4x4 forward_kinematics_with_tcp(
+      double t1, double t2, double t3, double t4, double t5, double t6, const Matrix4x4 &tcp)
+  {
+    return forward_kinematics(t1, t2, t3, t4, t5, t6) * tcp;
+  }
+};
+
+namespace ur3e
+{
+  using FK = UR_FK_Logic<Args>;
+
+  constexpr auto forward_kinematics = FK::forward_kinematics;
+  constexpr auto forward_kinematics_with_tcp = FK::forward_kinematics_with_tcp;
 }
 
-Matrix4x4 forward_kinematics_with_tcp(double theta1,
-                                      double theta2,
-                                      double theta3,
-                                      double theta4,
-                                      double theta5,
-                                      double theta6,
-                                      const Matrix4x4 &tcp_transform) {
-  return forward_kinematics(theta1, theta2, theta3, theta4, theta5, theta6) * tcp_transform;
+namespace ur5e
+{
+  using FK = UR_FK_Logic<Args>;
+
+  constexpr auto forward_kinematics = FK::forward_kinematics;
+  constexpr auto forward_kinematics_with_tcp = FK::forward_kinematics_with_tcp;
 }
 
-}  // namespace ur3
+namespace ur10e
+{
+  using FK = UR_FK_Logic<Args>;
 
-// ================================== UR3e ==================================
-namespace ur3e {
-Matrix4x4 forward_kinematics(
-    double theta1, double theta2, double theta3, double theta4, double theta5, double theta6) {
-  return ur_forward_kinematics(theta1, theta2, theta3, theta4, theta5, theta6, d1, d4, d5, d6, a2, a3);
+  constexpr auto forward_kinematics = FK::forward_kinematics;
+  constexpr auto forward_kinematics_with_tcp = FK::forward_kinematics_with_tcp;
 }
-
-Matrix4x4 forward_kinematics_with_tcp(double theta1,
-                                      double theta2,
-                                      double theta3,
-                                      double theta4,
-                                      double theta5,
-                                      double theta6,
-                                      const Matrix4x4 &tcp_transform) {
-  return forward_kinematics(theta1, theta2, theta3, theta4, theta5, theta6) * tcp_transform;
-}
-
-}  // namespace ur3e
-
-// ================================== UR5 ==================================
-namespace ur5 {
-Matrix4x4 forward_kinematics(
-    double theta1, double theta2, double theta3, double theta4, double theta5, double theta6) {
-  return ur_forward_kinematics(theta1, theta2, theta3, theta4, theta5, theta6, d1, d4, d5, d6, a2, a3);
-}
-
-Matrix4x4 forward_kinematics_with_tcp(double theta1,
-                                      double theta2,
-                                      double theta3,
-                                      double theta4,
-                                      double theta5,
-                                      double theta6,
-                                      const Matrix4x4 &tcp_transform) {
-  return forward_kinematics(theta1, theta2, theta3, theta4, theta5, theta6) * tcp_transform;
-}
-
-}  // namespace ur5
-
-// ================================== UR5e ==================================
-namespace ur5e {
-Matrix4x4 forward_kinematics(
-    double theta1, double theta2, double theta3, double theta4, double theta5, double theta6) {
-  return ur_forward_kinematics(theta1, theta2, theta3, theta4, theta5, theta6, d1, d4, d5, d6, a2, a3);
-}
-
-Matrix4x4 forward_kinematics_with_tcp(double theta1,
-                                      double theta2,
-                                      double theta3,
-                                      double theta4,
-                                      double theta5,
-                                      double theta6,
-                                      const Matrix4x4 &tcp_transform) {
-  return forward_kinematics(theta1, theta2, theta3, theta4, theta5, theta6) * tcp_transform;
-}
-
-}  // namespace ur5e
-
-// ================================== UR7e ==================================
-namespace ur7e {
-Matrix4x4 forward_kinematics(
-    double theta1, double theta2, double theta3, double theta4, double theta5, double theta6) {
-  return ur_forward_kinematics(theta1, theta2, theta3, theta4, theta5, theta6, d1, d4, d5, d6, a2, a3);
-}
-
-Matrix4x4 forward_kinematics_with_tcp(double theta1,
-                                      double theta2,
-                                      double theta3,
-                                      double theta4,
-                                      double theta5,
-                                      double theta6,
-                                      const Matrix4x4 &tcp_transform) {
-  return forward_kinematics(theta1, theta2, theta3, theta4, theta5, theta6) * tcp_transform;
-}
-
-}  // namespace ur7e
-
-// ================================== UR8 Long ==================================
-namespace ur8long {
-Matrix4x4 forward_kinematics(
-    double theta1, double theta2, double theta3, double theta4, double theta5, double theta6) {
-  return ur_forward_kinematics(theta1, theta2, theta3, theta4, theta5, theta6, d1, d4, d5, d6, a2, a3);
-}
-
-Matrix4x4 forward_kinematics_with_tcp(double theta1,
-                                      double theta2,
-                                      double theta3,
-                                      double theta4,
-                                      double theta5,
-                                      double theta6,
-                                      const Matrix4x4 &tcp_transform) {
-  return forward_kinematics(theta1, theta2, theta3, theta4, theta5, theta6) * tcp_transform;
-}
-
-}  // namespace ur8long
-
-// ================================== UR10 ==================================
-namespace ur10 {
-Matrix4x4 forward_kinematics(
-    double theta1, double theta2, double theta3, double theta4, double theta5, double theta6) {
-  return ur_forward_kinematics(theta1, theta2, theta3, theta4, theta5, theta6, d1, d4, d5, d6, a2, a3);
-}
-
-Matrix4x4 forward_kinematics_with_tcp(double theta1,
-                                      double theta2,
-                                      double theta3,
-                                      double theta4,
-                                      double theta5,
-                                      double theta6,
-                                      const Matrix4x4 &tcp_transform) {
-  return forward_kinematics(theta1, theta2, theta3, theta4, theta5, theta6) * tcp_transform;
-}  // namespace ur10
-
-// ================================== UR10e ==================================
-namespace ur10e {
-Matrix4x4 forward_kinematics(
-    double theta1, double theta2, double theta3, double theta4, double theta5, double theta6) {
-  return ur_forward_kinematics(theta1, theta2, theta3, theta4, theta5, theta6, d1, d4, d5, d6, a2, a3);
-}
-
-Matrix4x4 forward_kinematics_with_tcp(double theta1,
-                                      double theta2,
-                                      double theta3,
-                                      double theta4,
-                                      double theta5,
-                                      double theta6,
-                                      const Matrix4x4 &tcp_transform) {
-  return forward_kinematics(theta1, theta2, theta3, theta4, theta5, theta6) * tcp_transform;
-}  // namespace ur10
-
-// ================================== UR12e ==================================
-namespace ur12e {
-Matrix4x4 forward_kinematics(
-    double theta1, double theta2, double theta3, double theta4, double theta5, double theta6) {
-  return ur_forward_kinematics(theta1, theta2, theta3, theta4, theta5, theta6, d1, d4, d5, d6, a2, a3);
-}
-
-Matrix4x4 forward_kinematics_with_tcp(double theta1,
-                                      double theta2,
-                                      double theta3,
-                                      double theta4,
-                                      double theta5,
-                                      double theta6,
-                                      const Matrix4x4 &tcp_transform) {
-  return forward_kinematics(theta1, theta2, theta3, theta4, theta5, theta6) * tcp_transform;
-}
-
-}  // namespace ur12e
-
-// ================================== UR15 ==================================
-namespace ur15 {
-Matrix4x4 forward_kinematics(
-    double theta1, double theta2, double theta3, double theta4, double theta5, double theta6) {
-  return ur_forward_kinematics(theta1, theta2, theta3, theta4, theta5, theta6, d1, d4, d5, d6, a2, a3);
-}
-
-Matrix4x4 forward_kinematics_with_tcp(double theta1,
-                                      double theta2,
-                                      double theta3,
-                                      double theta4,
-                                      double theta5,
-                                      double theta6,
-                                      const Matrix4x4 &tcp_transform) {
-  return forward_kinematics(theta1, theta2, theta3, theta4, theta5, theta6) * tcp_transform;
-}
-
-}  // namespace ur15
-
-// ================================== UR16e ==================================
-namespace ur16e {
-Matrix4x4 forward_kinematics(
-    double theta1, double theta2, double theta3, double theta4, double theta5, double theta6) {
-  return ur_forward_kinematics(theta1, theta2, theta3, theta4, theta5, theta6, d1, d4, d5, d6, a2, a3);
-}
-
-Matrix4x4 forward_kinematics_with_tcp(double theta1,
-                                      double theta2,
-                                      double theta3,
-                                      double theta4,
-                                      double theta5,
-                                      double theta6,
-                                      const Matrix4x4 &tcp_transform) {
-  return forward_kinematics(theta1, theta2, theta3, theta4, theta5, theta6) * tcp_transform;
-}
-
-}  // namespace ur16e
-
-// ================================== UR18 ==================================
-namespace ur18 {
-Matrix4x4 forward_kinematics(
-    double theta1, double theta2, double theta3, double theta4, double theta5, double theta6) {
-  return ur_forward_kinematics(theta1, theta2, theta3, theta4, theta5, theta6, d1, d4, d5, d6, a2, a3);
-}
-
-Matrix4x4 forward_kinematics_with_tcp(double theta1,
-                                      double theta2,
-                                      double theta3,
-                                      double theta4,
-                                      double theta5,
-                                      double theta6,
-                                      const Matrix4x4 &tcp_transform) {
-  return forward_kinematics(theta1, theta2, theta3, theta4, theta5, theta6) * tcp_transform;
-}
-
-}  // namespace ur18
-
-// ================================== UR20 ==================================
-namespace ur20 {
-Matrix4x4 forward_kinematics(
-    double theta1, double theta2, double theta3, double theta4, double theta5, double theta6) {
-  return ur_forward_kinematics(theta1, theta2, theta3, theta4, theta5, theta6, d1, d4, d5, d6, a2, a3);
-}
-
-Matrix4x4 forward_kinematics_with_tcp(double theta1,
-                                      double theta2,
-                                      double theta3,
-                                      double theta4,
-                                      double theta5,
-                                      double theta6,
-                                      const Matrix4x4 &tcp_transform) {
-  return forward_kinematics(theta1, theta2, theta3, theta4, theta5, theta6) * tcp_transform;
-}
-
-}  // namespace ur20
-
-// ================================== UR30 ==================================
-namespace ur30 {
-Matrix4x4 forward_kinematics(
-    double theta1, double theta2, double theta3, double theta4, double theta5, double theta6) {
-  return ur_forward_kinematics(theta1, theta2, theta3, theta4, theta5, theta6, d1, d4, d5, d6, a2, a3);
-}
-
-Matrix4x4 forward_kinematics_with_tcp(double theta1,
-                                      double theta2,
-                                      double theta3,
-                                      double theta4,
-                                      double theta5,
-                                      double theta6,
-                                      const Matrix4x4 &tcp_transform) {
-  return forward_kinematics(theta1, theta2, theta3, theta4, theta5, theta6) * tcp_transform;
-}
-
-}  // namespace ur30
