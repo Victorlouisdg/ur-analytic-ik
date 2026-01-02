@@ -1,4 +1,5 @@
-"""use a set of (joint_config, pose) pairs  collected from a real robot to test if the IK/FK solutions correspond to the real robot.
+"""
+use a set of (joint_config, pose) pairs  collected from a real robot to test if the IK/FK solutions correspond to the real robot.
 """
 
 import numpy as np

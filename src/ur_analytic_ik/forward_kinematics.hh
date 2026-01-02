@@ -83,6 +83,14 @@ namespace ur5e
   constexpr auto forward_kinematics_with_tcp = FK::forward_kinematics_with_tcp;
 }
 
+namespace ur7e
+{
+  using FK = UR_FK_Logic<Args>;
+
+  constexpr auto forward_kinematics = FK::forward_kinematics;
+  constexpr auto forward_kinematics_with_tcp = FK::forward_kinematics_with_tcp;
+}
+
 namespace ur8long
 {
   using FK = UR_FK_Logic<Args>;
