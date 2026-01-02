@@ -1,6 +1,8 @@
 #pragma once
 #include <math.h>
 
+// https://www.universal-robots.com/articles/ur/application-installation/dh-parameters-for-calculations-of-kinematics-and-dynamics/
+
 namespace ur {
 const double alpha1 = M_PI_2;
 const double alpha4 = M_PI_2;
