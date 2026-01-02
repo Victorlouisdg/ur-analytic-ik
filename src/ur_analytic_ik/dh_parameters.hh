@@ -100,6 +100,15 @@ const double a2 = -0.6475;
 const double a3 = -0.5164;
 }  // namespace ur15
 
+namespace ur16e {
+const double d1 = 0.1807;
+const double d4 = 0.17415;
+const double d5 = 0.11985;
+const double d6 = 0.11655;
+const double a2 = -0.4784;
+const double a3 = -0.36;
+}  // namespace ur16e
+
 namespace ur18 {
 const double d1 = 0.2186;
 const double d4 = 0.1824;
