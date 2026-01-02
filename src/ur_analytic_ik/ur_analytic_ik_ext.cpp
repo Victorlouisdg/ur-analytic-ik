@@ -94,6 +94,14 @@ void define_inverse_kinematics_closest_with_tcp(
 }
 
 NB_MODULE(ur_analytic_ik_ext, m) {
+  nb::module_ m_ur3 = m.def_submodule("ur3", "UR3 module");
+  define_forward_kinematics(m_ur3, ur3::forward_kinematics);
+  define_forward_kinematics_with_tcp(m_ur3, ur3::forward_kinematics_with_tcp);
+  define_inverse_kinematics(m_ur3, ur3::inverse_kinematics);
+  define_inverse_kinematics_closest(m_ur3, ur3::inverse_kinematics_closest);
+  define_inverse_kinematics_with_tcp(m_ur3, ur3::inverse_kinematics_with_tcp);
+  define_inverse_kinematics_closest_with_tcp(m_ur3, ur3::inverse_kinematics_closest_with_tcp);
+
   nb::module_ m_ur3e = m.def_submodule("ur3e", "UR3e module");
   define_forward_kinematics(m_ur3e, ur3e::forward_kinematics);
   define_forward_kinematics_with_tcp(m_ur3e, ur3e::forward_kinematics_with_tcp);
@@ -101,6 +109,14 @@ NB_MODULE(ur_analytic_ik_ext, m) {
   define_inverse_kinematics_closest(m_ur3e, ur3e::inverse_kinematics_closest);
   define_inverse_kinematics_with_tcp(m_ur3e, ur3e::inverse_kinematics_with_tcp);
   define_inverse_kinematics_closest_with_tcp(m_ur3e, ur3e::inverse_kinematics_closest_with_tcp);
+
+  nb::module_ m_ur5 = m.def_submodule("ur5", "UR5 module");
+  define_forward_kinematics(m_ur5, ur5::forward_kinematics);
+  define_forward_kinematics_with_tcp(m_ur5, ur5::forward_kinematics_with_tcp);
+  define_inverse_kinematics(m_ur5, ur5::inverse_kinematics);
+  define_inverse_kinematics_closest(m_ur5, ur5::inverse_kinematics_closest);
+  define_inverse_kinematics_with_tcp(m_ur5, ur5::inverse_kinematics_with_tcp);
+  define_inverse_kinematics_closest_with_tcp(m_ur5, ur5::inverse_kinematics_closest_with_tcp);
 
   nb::module_ m_ur5e = m.def_submodule("ur5e", "UR5e module");
   define_forward_kinematics(m_ur5e, ur5e::forward_kinematics);
@@ -110,6 +126,30 @@ NB_MODULE(ur_analytic_ik_ext, m) {
   define_inverse_kinematics_with_tcp(m_ur5e, ur5e::inverse_kinematics_with_tcp);
   define_inverse_kinematics_closest_with_tcp(m_ur5e, ur5e::inverse_kinematics_closest_with_tcp);
 
+  nb::module_ m_ur7e = m.def_submodule("ur7e", "UR7e module");
+  define_forward_kinematics(m_ur7e, ur7e::forward_kinematics);
+  define_forward_kinematics_with_tcp(m_ur7e, ur7e::forward_kinematics_with_tcp);
+  define_inverse_kinematics(m_ur7e, ur7e::inverse_kinematics);
+  define_inverse_kinematics_closest(m_ur7e, ur7e::inverse_kinematics_closest);
+  define_inverse_kinematics_with_tcp(m_ur7e, ur7e::inverse_kinematics_with_tcp);
+  define_inverse_kinematics_closest_with_tcp(m_ur7e, ur7e::inverse_kinematics_closest_with_tcp);
+
+  nb::module_ m_ur8long = m.def_submodule("ur8long", "UR8long module");
+  define_forward_kinematics(m_ur8long, ur8long::forward_kinematics);
+  define_forward_kinematics_with_tcp(m_ur8long, ur8long::forward_kinematics_with_tcp);
+  define_inverse_kinematics(m_ur8long, ur8long::inverse_kinematics);
+  define_inverse_kinematics_closest(m_ur8long, ur8long::inverse_kinematics_closest);
+  define_inverse_kinematics_with_tcp(m_ur8long, ur8long::inverse_kinematics_with_tcp);
+  define_inverse_kinematics_closest_with_tcp(m_ur8long, ur8long::inverse_kinematics_closest_with_tcp);
+
+  nb::module_ m_ur10 = m.def_submodule("ur10", "UR10 module");
+  define_forward_kinematics(m_ur10, ur10::forward_kinematics);
+  define_forward_kinematics_with_tcp(m_ur10, ur10::forward_kinematics_with_tcp);
+  define_inverse_kinematics(m_ur10, ur10::inverse_kinematics);
+  define_inverse_kinematics_closest(m_ur10, ur10::inverse_kinematics_closest);
+  define_inverse_kinematics_with_tcp(m_ur10, ur10::inverse_kinematics_with_tcp);
+  define_inverse_kinematics_closest_with_tcp(m_ur10, ur10::inverse_kinematics_closest_with_tcp);
+
   nb::module_ m_ur10e = m.def_submodule("ur10e", "UR10e module");
   define_forward_kinematics(m_ur10e, ur10e::forward_kinematics);
   define_forward_kinematics_with_tcp(m_ur10e, ur10e::forward_kinematics_with_tcp);
@@ -117,6 +157,54 @@ NB_MODULE(ur_analytic_ik_ext, m) {
   define_inverse_kinematics_closest(m_ur10e, ur10e::inverse_kinematics_closest);
   define_inverse_kinematics_with_tcp(m_ur10e, ur10e::inverse_kinematics_with_tcp);
   define_inverse_kinematics_closest_with_tcp(m_ur10e, ur10e::inverse_kinematics_closest_with_tcp);
+
+  nb::module_ m_ur12e = m.def_submodule("ur12e", "UR12e module");
+  define_forward_kinematics(m_ur12e, ur12e::forward_kinematics);
+  define_forward_kinematics_with_tcp(m_ur12e, ur12e::forward_kinematics_with_tcp);
+  define_inverse_kinematics(m_ur12e, ur12e::inverse_kinematics);
+  define_inverse_kinematics_closest(m_ur12e, ur12e::inverse_kinematics_closest);
+  define_inverse_kinematics_with_tcp(m_ur12e, ur12e::inverse_kinematics_with_tcp);
+  define_inverse_kinematics_closest_with_tcp(m_ur12e, ur12e::inverse_kinematics_closest_with_tcp);
+
+  nb::module_ m_ur15 = m.def_submodule("ur15", "UR15 module");
+  define_forward_kinematics(m_ur15, ur15::forward_kinematics);
+  define_forward_kinematics_with_tcp(m_ur15, ur15::forward_kinematics_with_tcp);
+  define_inverse_kinematics(m_ur15, ur15::inverse_kinematics);
+  define_inverse_kinematics_closest(m_ur15, ur15::inverse_kinematics_closest);
+  define_inverse_kinematics_with_tcp(m_ur15, ur15::inverse_kinematics_with_tcp);
+  define_inverse_kinematics_closest_with_tcp(m_ur15, ur15::inverse_kinematics_closest_with_tcp);
+
+  nb::module_ m_ur16e = m.def_submodule("ur16e", "UR16e module");
+  define_forward_kinematics(m_ur16e, ur16e::forward_kinematics);
+  define_forward_kinematics_with_tcp(m_ur16e, ur16e::forward_kinematics_with_tcp);
+  define_inverse_kinematics(m_ur16e, ur16e::inverse_kinematics);
+  define_inverse_kinematics_closest(m_ur16e, ur16e::inverse_kinematics_closest);
+  define_inverse_kinematics_with_tcp(m_ur16e, ur16e::inverse_kinematics_with_tcp);
+  define_inverse_kinematics_closest_with_tcp(m_ur16e, ur16e::inverse_kinematics_closest_with_tcp);
+
+  nb::module_ m_ur18 = m.def_submodule("ur18", "UR18 module");
+  define_forward_kinematics(m_ur18, ur18::forward_kinematics);
+  define_forward_kinematics_with_tcp(m_ur18, ur18::forward_kinematics_with_tcp);
+  define_inverse_kinematics(m_ur18, ur18::inverse_kinematics);
+  define_inverse_kinematics_closest(m_ur18, ur18::inverse_kinematics_closest);
+  define_inverse_kinematics_with_tcp(m_ur18, ur18::inverse_kinematics_with_tcp);
+  define_inverse_kinematics_closest_with_tcp(m_ur18, ur18::inverse_kinematics_closest_with_tcp);
+
+  nb::module_ m_ur20 = m.def_submodule("ur20", "UR20 module");
+  define_forward_kinematics(m_ur20, ur20::forward_kinematics);
+  define_forward_kinematics_with_tcp(m_ur20, ur20::forward_kinematics_with_tcp);
+  define_inverse_kinematics(m_ur20, ur20::inverse_kinematics);
+  define_inverse_kinematics_closest(m_ur20, ur20::inverse_kinematics_closest);
+  define_inverse_kinematics_with_tcp(m_ur20, ur20::inverse_kinematics_with_tcp);
+  define_inverse_kinematics_closest_with_tcp(m_ur20, ur20::inverse_kinematics_closest_with_tcp);
+
+  nb::module_ m_ur30 = m.def_submodule("ur30", "UR30 module");
+  define_forward_kinematics(m_ur30, ur30::forward_kinematics);
+  define_forward_kinematics_with_tcp(m_ur30, ur30::forward_kinematics_with_tcp);
+  define_inverse_kinematics(m_ur30, ur30::inverse_kinematics);
+  define_inverse_kinematics_closest(m_ur30, ur30::inverse_kinematics_closest);
+  define_inverse_kinematics_with_tcp(m_ur30, ur30::inverse_kinematics_with_tcp);
+  define_inverse_kinematics_closest_with_tcp(m_ur30, ur30::inverse_kinematics_closest_with_tcp);
 
   // This function is mostly still here to understand nanobind.
   // Once we properly handle tensors without copying etc, we can remove this.

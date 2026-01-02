@@ -402,7 +402,25 @@ struct UR_IK_Logic
   }
 };
 
+namespace ur3 {
+  using Logic = UR_IK_Logic<Args>;
+
+  constexpr auto inverse_kinematics = Logic::inverse_kinematics;
+  constexpr auto inverse_kinematics_with_tcp = Logic::inverse_kinematics_with_tcp;
+  constexpr auto inverse_kinematics_closest = Logic::inverse_kinematics_closest;
+  constexpr auto inverse_kinematics_closest_with_tcp = Logic::inverse_kinematics_closest_with_tcp;
+}
+
 namespace ur3e {
+  using Logic = UR_IK_Logic<Args>;
+
+  constexpr auto inverse_kinematics = Logic::inverse_kinematics;
+  constexpr auto inverse_kinematics_with_tcp = Logic::inverse_kinematics_with_tcp;
+  constexpr auto inverse_kinematics_closest = Logic::inverse_kinematics_closest;
+  constexpr auto inverse_kinematics_closest_with_tcp = Logic::inverse_kinematics_closest_with_tcp;
+}
+
+namespace ur5 {
   using Logic = UR_IK_Logic<Args>;
 
   constexpr auto inverse_kinematics = Logic::inverse_kinematics;
@@ -420,7 +438,88 @@ namespace ur5e {
   constexpr auto inverse_kinematics_closest_with_tcp = Logic::inverse_kinematics_closest_with_tcp;
 }
 
+namespace ur7e {
+  using Logic = UR_IK_Logic<Args>;
+
+  constexpr auto inverse_kinematics = Logic::inverse_kinematics;
+  constexpr auto inverse_kinematics_with_tcp = Logic::inverse_kinematics_with_tcp;
+  constexpr auto inverse_kinematics_closest = Logic::inverse_kinematics_closest;
+  constexpr auto inverse_kinematics_closest_with_tcp = Logic::inverse_kinematics_closest_with_tcp;
+}
+
+namespace ur8long {
+  using Logic = UR_IK_Logic<Args>;
+
+  constexpr auto inverse_kinematics = Logic::inverse_kinematics;
+  constexpr auto inverse_kinematics_with_tcp = Logic::inverse_kinematics_with_tcp;
+  constexpr auto inverse_kinematics_closest = Logic::inverse_kinematics_closest;
+  constexpr auto inverse_kinematics_closest_with_tcp = Logic::inverse_kinematics_closest_with_tcp;
+}
+
+namespace ur10 {
+  using Logic = UR_IK_Logic<Args>;
+
+  constexpr auto inverse_kinematics = Logic::inverse_kinematics;
+  constexpr auto inverse_kinematics_with_tcp = Logic::inverse_kinematics_with_tcp;
+  constexpr auto inverse_kinematics_closest = Logic::inverse_kinematics_closest;
+  constexpr auto inverse_kinematics_closest_with_tcp = Logic::inverse_kinematics_closest_with_tcp;
+}
+
 namespace ur10e {
+  using Logic = UR_IK_Logic<Args>;
+
+  constexpr auto inverse_kinematics = Logic::inverse_kinematics;
+  constexpr auto inverse_kinematics_with_tcp = Logic::inverse_kinematics_with_tcp;
+  constexpr auto inverse_kinematics_closest = Logic::inverse_kinematics_closest;
+  constexpr auto inverse_kinematics_closest_with_tcp = Logic::inverse_kinematics_closest_with_tcp;
+}
+
+namespace ur12e {
+  using Logic = UR_IK_Logic<Args>;
+
+  constexpr auto inverse_kinematics = Logic::inverse_kinematics;
+  constexpr auto inverse_kinematics_with_tcp = Logic::inverse_kinematics_with_tcp;
+  constexpr auto inverse_kinematics_closest = Logic::inverse_kinematics_closest;
+  constexpr auto inverse_kinematics_closest_with_tcp = Logic::inverse_kinematics_closest_with_tcp;
+}
+
+namespace ur15 {
+  using Logic = UR_IK_Logic<Args>;
+
+  constexpr auto inverse_kinematics = Logic::inverse_kinematics;
+  constexpr auto inverse_kinematics_with_tcp = Logic::inverse_kinematics_with_tcp;
+  constexpr auto inverse_kinematics_closest = Logic::inverse_kinematics_closest;
+  constexpr auto inverse_kinematics_closest_with_tcp = Logic::inverse_kinematics_closest_with_tcp;
+}
+
+namespace ur16e {
+  using Logic = UR_IK_Logic<Args>;
+
+  constexpr auto inverse_kinematics = Logic::inverse_kinematics;
+  constexpr auto inverse_kinematics_with_tcp = Logic::inverse_kinematics_with_tcp;
+  constexpr auto inverse_kinematics_closest = Logic::inverse_kinematics_closest;
+  constexpr auto inverse_kinematics_closest_with_tcp = Logic::inverse_kinematics_closest_with_tcp;
+}
+
+namespace ur18 {
+  using Logic = UR_IK_Logic<Args>;
+
+  constexpr auto inverse_kinematics = Logic::inverse_kinematics;
+  constexpr auto inverse_kinematics_with_tcp = Logic::inverse_kinematics_with_tcp;
+  constexpr auto inverse_kinematics_closest = Logic::inverse_kinematics_closest;
+  constexpr auto inverse_kinematics_closest_with_tcp = Logic::inverse_kinematics_closest_with_tcp;
+}
+
+namespace ur20 {
+  using Logic = UR_IK_Logic<Args>;
+
+  constexpr auto inverse_kinematics = Logic::inverse_kinematics;
+  constexpr auto inverse_kinematics_with_tcp = Logic::inverse_kinematics_with_tcp;
+  constexpr auto inverse_kinematics_closest = Logic::inverse_kinematics_closest;
+  constexpr auto inverse_kinematics_closest_with_tcp = Logic::inverse_kinematics_closest_with_tcp;
+}
+
+namespace ur30 {
   using Logic = UR_IK_Logic<Args>;
 
   constexpr auto inverse_kinematics = Logic::inverse_kinematics;

@@ -51,7 +51,23 @@ struct UR_FK_Logic
   }
 };
 
+namespace ur3
+{
+  using FK = UR_FK_Logic<Args>;
+
+  constexpr auto forward_kinematics = FK::forward_kinematics;
+  constexpr auto forward_kinematics_with_tcp = FK::forward_kinematics_with_tcp;
+}
+
 namespace ur3e
+{
+  using FK = UR_FK_Logic<Args>;
+
+  constexpr auto forward_kinematics = FK::forward_kinematics;
+  constexpr auto forward_kinematics_with_tcp = FK::forward_kinematics_with_tcp;
+}
+
+namespace ur5
 {
   using FK = UR_FK_Logic<Args>;
 
@@ -67,7 +83,71 @@ namespace ur5e
   constexpr auto forward_kinematics_with_tcp = FK::forward_kinematics_with_tcp;
 }
 
+namespace ur8long
+{
+  using FK = UR_FK_Logic<Args>;
+
+  constexpr auto forward_kinematics = FK::forward_kinematics;
+  constexpr auto forward_kinematics_with_tcp = FK::forward_kinematics_with_tcp;
+}
+
+namespace ur10
+{
+  using FK = UR_FK_Logic<Args>;
+
+  constexpr auto forward_kinematics = FK::forward_kinematics;
+  constexpr auto forward_kinematics_with_tcp = FK::forward_kinematics_with_tcp;
+}
+
 namespace ur10e
+{
+  using FK = UR_FK_Logic<Args>;
+
+  constexpr auto forward_kinematics = FK::forward_kinematics;
+  constexpr auto forward_kinematics_with_tcp = FK::forward_kinematics_with_tcp;
+}
+
+namespace ur12e
+{
+  using FK = UR_FK_Logic<Args>;
+
+  constexpr auto forward_kinematics = FK::forward_kinematics;
+  constexpr auto forward_kinematics_with_tcp = FK::forward_kinematics_with_tcp;
+}
+
+namespace ur15
+{
+  using FK = UR_FK_Logic<Args>;
+
+  constexpr auto forward_kinematics = FK::forward_kinematics;
+  constexpr auto forward_kinematics_with_tcp = FK::forward_kinematics_with_tcp;
+}
+
+namespace ur16e
+{
+  using FK = UR_FK_Logic<Args>;
+
+  constexpr auto forward_kinematics = FK::forward_kinematics;
+  constexpr auto forward_kinematics_with_tcp = FK::forward_kinematics_with_tcp;
+}
+
+namespace ur18
+{
+  using FK = UR_FK_Logic<Args>;
+
+  constexpr auto forward_kinematics = FK::forward_kinematics;
+  constexpr auto forward_kinematics_with_tcp = FK::forward_kinematics_with_tcp;
+}
+
+namespace ur20
+{
+  using FK = UR_FK_Logic<Args>;
+
+  constexpr auto forward_kinematics = FK::forward_kinematics;
+  constexpr auto forward_kinematics_with_tcp = FK::forward_kinematics_with_tcp;
+}
+
+namespace ur30
 {
   using FK = UR_FK_Logic<Args>;
 
