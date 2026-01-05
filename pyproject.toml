@@ -12,7 +12,7 @@ build-backend = "scikit_build_core.build"
 
 [project]
 name = "ur_analytic_ik"
-version = "0.1.0"
+version = "0.1.0-fix3"
 description = "C++ implementation with Python bindings of analytic forward and inverse kinematics for the Universal Robots."
 readme = "README.md"
 requires-python = ">=3.9"
